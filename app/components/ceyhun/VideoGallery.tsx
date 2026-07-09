@@ -6,7 +6,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
-import { pick, videoThumb, videoEmbedUrl, type Locale } from "@/app/lib/ceyhun";
+import { pick, videoThumb, videoEmbedUrl, isDirectVideo, isMuxProvider, parseMuxRef, type Locale } from "@/app/lib/ceyhun";
+import MuxVideo from "./MuxVideo";
 
 export type PublicVideo = {
   id: string;
@@ -59,7 +60,9 @@ export default function VideoGallery({ videos, locale }: { videos: PublicVideo[]
           </button>
           <div className="w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <div className="relative aspect-video overflow-hidden rounded-2xl bg-black shadow-2xl">
-              {active.provider === "cloudinary" ? (
+              {isMuxProvider(active.provider) ? (
+                <MuxVideo playbackId={parseMuxRef(active.videoRef).playbackId} title={pick(active.title, locale)} autoPlay />
+              ) : isDirectVideo(active.provider) ? (
                 <video src={active.videoRef} controls autoPlay className="h-full w-full" />
               ) : (
                 <iframe

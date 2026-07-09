@@ -9,6 +9,8 @@ import { saveCourse, deleteCourse, saveLesson, deleteLesson, type AdminResult } 
 import MultiLangField from "../_components/MultiLangField";
 import RichTextField from "../_components/RichTextField";
 import ImageUpload from "../_components/ImageUpload";
+import VideoUpload from "../_components/VideoUpload";
+import MuxVideoUpload from "../_components/MuxVideoUpload";
 
 type Lang = { tr: string; en: string; de: string };
 export type LessonDTO = { id: string; title: Lang; description: Lang; provider: string; videoRef: string; durationSec: number; isFreePreview: boolean; order: number };
@@ -94,11 +96,8 @@ export default function CourseManager({ items }: { items: CourseDTO[] }) {
 // ─── Bir kursun dersleri ───
 function LessonPanel({ course }: { course: CourseDTO }) {
   const [editing, setEditing] = useState<LessonDTO | null>(null);
-  const [state, formAction, pending] = useActionState(saveLesson, initial);
   const [delPending, startDel] = useTransition();
-  useEffect(() => { if (state.ok) setEditing(null); }, [state]);
-  const emptyLesson: LessonDTO = { id: "", title: { tr: "", en: "", de: "" }, description: { tr: "", en: "", de: "" }, provider: "youtube", videoRef: "", durationSec: 0, isFreePreview: false, order: course.lessons.length };
-  const inp = "w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold";
+  const emptyLesson: LessonDTO = { id: "", title: { tr: "", en: "", de: "" }, description: { tr: "", en: "", de: "" }, provider: "mux", videoRef: "", durationSec: 0, isFreePreview: false, order: course.lessons.length };
 
   return (
     <div className="border-t border-black/5 bg-gray-50/60 px-4 py-4 sm:px-5">
@@ -121,34 +120,78 @@ function LessonPanel({ course }: { course: CourseDTO }) {
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
-          <form action={formAction} className="my-8 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h3 className="font-syne text-lg font-bold">{editing.id ? "Dersi düzenle" : "Yeni ders"}</h3>
-              <button type="button" onClick={() => setEditing(null)} className="text-ink/40 hover:text-ink"><X className="h-5 w-5" /></button>
-            </div>
-            <input type="hidden" name="courseId" value={course.id} />
-            {editing.id && <input type="hidden" name="id" value={editing.id} />}
-            <div className="grid grid-cols-2 gap-4">
-              <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Kaynak</span>
-                <select name="provider" defaultValue={editing.provider} className={inp}><option value="youtube">YouTube</option><option value="vimeo">Vimeo</option><option value="cloudinary">Cloudinary / MP4</option></select></label>
-              <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Sıra</span><input name="order" type="number" defaultValue={String(editing.order)} className={inp} /></label>
-            </div>
-            <label className="mt-4 block"><span className="mb-1 block text-xs font-medium text-ink/50">Video bağlantısı / kimliği *</span><input name="videoRef" defaultValue={editing.videoRef} placeholder="https://youtu.be/…" className={inp} /></label>
-            <MultiLangField base="title" label="Ders başlığı" value={editing.title} required />
-            <MultiLangField base="description" label="Açıklama" value={editing.description} textarea rows={2} />
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Süre (sn)</span><input name="durationSec" type="number" defaultValue={String(editing.durationSec)} className={inp} /></label>
-              <label className="flex items-end gap-2 pb-2 text-sm"><input type="checkbox" name="isFreePreview" defaultChecked={editing.isFreePreview} className="h-4 w-4" /> Ücretsiz önizleme</label>
-            </div>
-            {state.message && !state.ok && <p className="mt-3 text-sm text-red-600">{state.message}</p>}
-            <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={() => setEditing(null)} className="rounded-full px-5 py-2.5 text-sm font-medium text-ink/60 hover:bg-gray-100">Vazgeç</button>
-              <button type="submit" disabled={pending} className="inline-flex items-center gap-2 rounded-full bg-ceyhun-ink px-5 py-2.5 text-sm font-medium text-white hover:bg-ceyhun-gold-deep disabled:opacity-60"><Save className="h-4 w-4" /> {pending ? "…" : "Kaydet"}</button>
-            </div>
-          </form>
-        </div>
+        <LessonForm key={editing.id || "new"} editing={editing} courseId={course.id} onClose={() => setEditing(null)} />
       )}
+    </div>
+  );
+}
+
+// ─── Ders ekle/düzenle (kontrollü: Mux yükleme için kaynak+videoRef+süre state'te) ───
+function LessonForm({ editing, courseId, onClose }: { editing: LessonDTO; courseId: string; onClose: () => void }) {
+  const [state, formAction, pending] = useActionState(saveLesson, initial);
+  const [provider, setProvider] = useState(editing.provider || "mux");
+  const [videoRef, setVideoRef] = useState(editing.videoRef || "");
+  const [durationSec, setDurationSec] = useState(editing.durationSec || 0);
+  useEffect(() => { if (state.ok) onClose(); }, [state, onClose]);
+  const inp = "w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold";
+  const isMux = provider === "mux";
+  const isUpload = provider === "mediaserver" || provider === "cloudinary";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
+      <form action={formAction} className="my-8 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="font-syne text-lg font-bold">{editing.id ? "Dersi düzenle" : "Yeni ders"}</h3>
+          <button type="button" onClick={onClose} className="text-ink/40 hover:text-ink"><X className="h-5 w-5" /></button>
+        </div>
+        <input type="hidden" name="courseId" value={courseId} />
+        {editing.id && <input type="hidden" name="id" value={editing.id} />}
+        {/* Kontrollü alanlar → action'a taşınır */}
+        <input type="hidden" name="videoRef" value={videoRef} readOnly />
+        <input type="hidden" name="durationSec" value={String(durationSec)} readOnly />
+
+        <div className="grid grid-cols-2 gap-4">
+          <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Kaynak</span>
+            <select name="provider" value={provider} onChange={(e) => setProvider(e.target.value)} className={inp}>
+              <option value="mux">Mux (yükle · adaptif · önerilen)</option>
+              <option value="mediaserver">Kendi sunucum / MP4</option>
+              <option value="youtube">YouTube</option>
+              <option value="vimeo">Vimeo</option>
+            </select></label>
+          <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Sıra</span><input name="order" type="number" defaultValue={String(editing.order)} className={inp} /></label>
+        </div>
+
+        {/* Kaynağa göre: Mux yükleyici / kendi sunucu yükleyici / bağlantı alanı */}
+        {isMux ? (
+          <div className="mt-4">
+            <MuxVideoUpload value={videoRef}
+              onUploaded={({ videoRef: ref, durationSec: d }) => { setVideoRef(ref); if (d) setDurationSec(d); }}
+              onClear={() => setVideoRef("")} />
+          </div>
+        ) : isUpload ? (
+          <div className="mt-4">
+            <VideoUpload value={videoRef}
+              onUploaded={({ url, durationSec: d }) => { setVideoRef(url); if (d) setDurationSec(d); }}
+              onClear={() => setVideoRef("")} />
+          </div>
+        ) : (
+          <label className="mt-4 block"><span className="mb-1 block text-xs font-medium text-ink/50">Video bağlantısı / kimliği *</span>
+            <input value={videoRef} onChange={(e) => setVideoRef(e.target.value)} placeholder="https://youtu.be/…" className={inp} /></label>
+        )}
+
+        <MultiLangField base="title" label="Ders başlığı" value={editing.title} required />
+        <MultiLangField base="description" label="Açıklama" value={editing.description} textarea rows={2} />
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Süre (sn)</span>
+            <input type="number" value={String(durationSec)} onChange={(e) => setDurationSec(Number(e.target.value) || 0)} className={inp} /></label>
+          <label className="flex items-end gap-2 pb-2 text-sm"><input type="checkbox" name="isFreePreview" defaultChecked={editing.isFreePreview} className="h-4 w-4" /> Ücretsiz önizleme</label>
+        </div>
+        {state.message && !state.ok && <p className="mt-3 text-sm text-red-600">{state.message}</p>}
+        <div className="mt-6 flex justify-end gap-3">
+          <button type="button" onClick={onClose} className="rounded-full px-5 py-2.5 text-sm font-medium text-ink/60 hover:bg-gray-100">Vazgeç</button>
+          <button type="submit" disabled={pending} className="inline-flex items-center gap-2 rounded-full bg-ceyhun-ink px-5 py-2.5 text-sm font-medium text-white hover:bg-ceyhun-gold-deep disabled:opacity-60"><Save className="h-4 w-4" /> {pending ? "…" : "Kaydet"}</button>
+        </div>
+      </form>
     </div>
   );
 }

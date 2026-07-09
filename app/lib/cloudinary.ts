@@ -25,6 +25,21 @@ export function isCloudinaryConfigured() {
   return Boolean(cloudName && apiKey && apiSecret);
 }
 
+// Tarayıcıdan doğrudan (imzalı) yükleme için imza üretir.
+// Büyük video dosyaları sunucudan geçmeden doğrudan Cloudinary'ye yüklenir.
+// paramsToSign: file/api_key/resource_type/cloud_name HARİÇ, gönderilecek tüm alanlar (ör. folder).
+export function signUpload(paramsToSign: Record<string, string | number> = {}): {
+  signature: string;
+  timestamp: number;
+  apiKey: string;
+  cloudName: string;
+} {
+  const timestamp = Math.round(Date.now() / 1000);
+  const toSign = { ...paramsToSign, timestamp };
+  const signature = cloudinary.utils.api_sign_request(toSign, apiSecret as string);
+  return { signature, timestamp, apiKey: apiKey as string, cloudName: cloudName as string };
+}
+
 export type UploadResult = { url: string; publicId: string; width?: number; height?: number };
 
 // Buffer'ı Cloudinary'ye yükler. folder → "invenimus/<folder>".
@@ -51,6 +66,48 @@ export function uploadImage(buffer: Buffer, folder = "cms"): Promise<UploadResul
     );
     stream.end(buffer);
   });
+}
+
+// Cloudinary secure_url'inden public_id + kaynak türünü çıkarır (silme için).
+// Örn: https://res.cloudinary.com/<cloud>/video/upload/v123/invenimus/videos/abc.mp4
+//      → { publicId: "invenimus/videos/abc", resourceType: "video" }
+export function parseCloudinaryUrl(
+  url: string | null | undefined
+): { publicId: string; resourceType: "image" | "video" | "raw" } | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (!/(^|\.)res\.cloudinary\.com$/.test(u.hostname)) return null;
+    const parts = u.pathname.split("/").filter(Boolean); // [cloud, rtype, "upload", ...rest]
+    const uploadIdx = parts.indexOf("upload");
+    if (uploadIdx < 1) return null;
+    const rtype = parts[uploadIdx - 1];
+    let rest = parts.slice(uploadIdx + 1);
+    // sürüm segmentini (v1234...) at
+    if (rest[0] && /^v\d+$/.test(rest[0])) rest = rest.slice(1);
+    if (!rest.length) return null;
+    const last = rest[rest.length - 1].replace(/\.[^.]+$/, ""); // uzantıyı at
+    const publicId = [...rest.slice(0, -1), last].join("/");
+    const resourceType = rtype === "video" || rtype === "raw" ? (rtype as "video" | "raw") : "image";
+    return { publicId, resourceType };
+  } catch {
+    return null;
+  }
+}
+
+// Cloudinary URL'sine ait varlığı siler (best-effort; Cloudinary URL değilse sessizce geçer).
+// Videoyu silmek, ondan türetilen poster/thumbnail'leri de temizler (invalidate).
+export async function destroyByUrl(url: string | null | undefined): Promise<void> {
+  const parsed = parseCloudinaryUrl(url);
+  if (!parsed) return;
+  try {
+    await cloudinary.uploader.destroy(parsed.publicId, {
+      resource_type: parsed.resourceType,
+      invalidate: true,
+    });
+  } catch (e) {
+    console.error("[cloudinary] destroy hatası:", e);
+  }
 }
 
 export default cloudinary;

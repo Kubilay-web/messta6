@@ -23,6 +23,7 @@ export default async function AdminVideosPage() {
     featured: r.featured,
     published: r.published,
     order: r.order,
+    durationSec: r.durationSec,
     views: r.views,
   }));
 

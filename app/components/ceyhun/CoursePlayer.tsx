@@ -5,9 +5,10 @@
 
 import { useState } from "react";
 import { PlayCircle, CheckCircle2, Clock } from "lucide-react";
-import { pick, videoEmbedUrl, type Locale } from "@/app/lib/ceyhun";
+import { pick, videoEmbedUrl, isDirectVideo, isMuxProvider, parseMuxRef, type Locale } from "@/app/lib/ceyhun";
 import { useCeyhunT } from "@/app/lib/useCeyhunT";
 import DonateWidget from "./DonateWidget";
+import MuxVideo from "./MuxVideo";
 import { Prose } from "./ui";
 
 export type PlayerLesson = {
@@ -56,7 +57,9 @@ export default function CoursePlayer({
         {/* Oynatıcı */}
         <div className="relative aspect-video overflow-hidden rounded-2xl bg-black shadow-lg">
           {current ? (
-            current.provider === "cloudinary" ? (
+            isMuxProvider(current.provider) ? (
+              <MuxVideo key={current.id} playbackId={parseMuxRef(current.videoRef).playbackId} title={pick(current.title, locale)} />
+            ) : isDirectVideo(current.provider) ? (
               <video key={current.id} src={current.videoRef} controls className="h-full w-full" />
             ) : (
               <iframe key={current.id} src={videoEmbedUrl(current.provider, current.videoRef)} className="h-full w-full"

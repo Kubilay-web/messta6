@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@lucia-auth/adapter-prisma": "^4.0.1",
+    "@mux/mux-node": "^8.8.0",
+    "@mux/mux-player-react": "^3.13.0",
+    "@mux/upchunk": "^3.5.0",
     "@node-rs/argon2": "^2.0.2",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "@prisma/client": "^6.13.0",
@@ -58,6 +61,7 @@
     "sass": "^1.83.0",
     "simplebar-react": "^3.3.0",
     "slugify": "^1.6.6",
+    "socket.io-client": "^4.8.3",
     "sonner": "^2.0.7",
     "stream-chat": "^9.14.0",
     "stripe": "^18.4.0",

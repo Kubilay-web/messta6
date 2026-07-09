@@ -99,6 +99,31 @@ export function youtubeThumb(ref: string): string {
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
 }
 
+// Doğrudan dosya mı (kendi medya sunucumuz / cloudinary / yerel mp4) yoksa embed mi (youtube/vimeo)?
+// Doğrudan dosyalar <video> ile, embed'ler <iframe> ile oynatılır.
+export function isDirectVideo(provider: string): boolean {
+  return provider === "mediaserver" || provider === "cloudinary" || provider === "local";
+}
+
+// ─────────────────────────── Mux yardımcıları (istemci-güvenli) ───────────────────────────
+// DB'de saklanan videoRef biçimi: "<assetId>:<playbackId>"  (assetId boş olabilir: ":pbid" ya da "pbid").
+export function isMuxProvider(provider: string): boolean {
+  return provider === "mux";
+}
+
+export function parseMuxRef(ref: string | null | undefined): { assetId: string; playbackId: string } {
+  if (!ref) return { assetId: "", playbackId: "" };
+  const i = ref.indexOf(":");
+  if (i === -1) return { assetId: "", playbackId: ref };
+  return { assetId: ref.slice(0, i), playbackId: ref.slice(i + 1) };
+}
+
+// Mux otomatik küçük resmi (playbackId'den). public playback policy ile herkese açık.
+export function muxThumb(ref: string | null | undefined): string {
+  const { playbackId } = parseMuxRef(ref);
+  return playbackId ? `https://image.mux.com/${playbackId}/thumbnail.jpg?time=1` : "";
+}
+
 // Video kaydından oynatılabilir embed URL üret.
 export function videoEmbedUrl(provider: string, ref: string): string {
   if (provider === "youtube") return youtubeEmbed(ref);
@@ -113,6 +138,7 @@ export function videoEmbedUrl(provider: string, ref: string): string {
 export function videoThumb(provider: string, ref: string, thumbUrl?: string | null): string {
   if (thumbUrl) return thumbUrl;
   if (provider === "youtube") return youtubeThumb(ref);
+  if (provider === "mux") return muxThumb(ref);
   return "";
 }
 

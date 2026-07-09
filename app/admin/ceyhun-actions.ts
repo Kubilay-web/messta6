@@ -10,6 +10,36 @@ import prisma from "@/app/lib/prisma";
 import { requireCeyhunCap } from "@/app/lib/ceyhun-auth";
 import { isCeyhunRole, type CeyhunRole } from "@/app/lib/ceyhun-roles";
 import { packLangFromForm, estimateReadMinutes, unpackLang } from "@/app/lib/ceyhun";
+import { destroyByUrl } from "@/app/lib/cloudinary";
+import { isMediaServerUrl, deleteFromMediaServer } from "@/app/lib/media-server";
+import { deleteMuxByRef } from "@/app/lib/ceyhun-mux";
+
+// Bir medya URL'sini kaynağına göre temizler: kendi medya sunucumuz / Cloudinary / yerel (/uploads/..).
+// Hepsi best-effort — silme başarısız olsa da DB işlemi engellenmez.
+async function purgeMedia(url: string | null | undefined) {
+  if (!url) return;
+  if (isMediaServerUrl(url)) {
+    await deleteFromMediaServer(url);
+    return;
+  }
+  if (url.startsWith("/uploads/")) {
+    try {
+      const { unlink } = await import("fs/promises");
+      const path = await import("path");
+      await unlink(path.join(process.cwd(), "public", url));
+    } catch {
+      /* dosya yoksa/erişilemezse geç */
+    }
+    return;
+  }
+  await destroyByUrl(url);
+}
+
+// Bir görsel/video alanı GÜNCELLENİRKEN: eski URL yenisinden farklıysa (değiştirildi veya kaldırıldı)
+// eskisini kaynağından temizle. Aynıysa (değişmediyse) dokunma. purgeMedia zaten Cloudinary/yerel dışını yutar.
+async function purgeIfReplaced(oldUrl: string | null | undefined, newUrl: string | null | undefined) {
+  if (oldUrl && oldUrl !== newUrl) await purgeMedia(oldUrl);
+}
 
 export type AdminResult = { ok: boolean; message?: string; id?: string };
 
@@ -84,11 +114,15 @@ export async function saveProfile(_prev: AdminResult, fd: FormData): Promise<Adm
     socials,
   };
 
+  const existing = await prisma.ceyhunProfile.findUnique({ where: { key: "main" } });
   await prisma.ceyhunProfile.upsert({
     where: { key: "main" },
     create: { key: "main", ...data },
     update: data,
   });
+  // Avatar/kapak değiştirildiyse eski görselleri Cloudinary'den temizle.
+  await purgeIfReplaced(existing?.avatarUrl, data.avatarUrl);
+  await purgeIfReplaced(existing?.coverUrl, data.coverUrl);
   revalidateAll("/admin/profile");
   return { ok: true };
 }
@@ -137,6 +171,7 @@ export async function saveArticle(_prev: AdminResult, fd: FormData): Promise<Adm
         ? existing?.publishedAt ?? new Date()
         : null;
       await prisma.ceyhunArticle.update({ where: { id }, data: { ...data, publishedAt } });
+      await purgeIfReplaced(existing?.coverUrl, data.coverUrl); // kapak değiştiyse eskisini sil
       revalidateAll(`/articles/${slug}`);
       return { ok: true, id };
     }
@@ -151,7 +186,9 @@ export async function saveArticle(_prev: AdminResult, fd: FormData): Promise<Adm
 
 export async function deleteArticle(id: string): Promise<AdminResult> {
   await requireEditor();
+  const row = await prisma.ceyhunArticle.findUnique({ where: { id }, select: { coverUrl: true } });
   await prisma.ceyhunArticle.delete({ where: { id } });
+  await purgeMedia(row?.coverUrl); // kapak görselini de temizle
   revalidateAll("/articles");
   return { ok: true };
 }
@@ -180,15 +217,39 @@ export async function saveVideo(_prev: AdminResult, fd: FormData): Promise<Admin
     order: num(fd.get("order")),
   };
 
-  if (id) await prisma.ceyhunVideo.update({ where: { id }, data });
-  else await prisma.ceyhunVideo.create({ data });
+  if (id) {
+    const existing = await prisma.ceyhunVideo.findUnique({
+      where: { id },
+      select: { provider: true, videoRef: true, thumbUrl: true },
+    });
+    await prisma.ceyhunVideo.update({ where: { id }, data });
+    // Video dosyası veya poster değiştirildiyse eskisini kaynağından temizle.
+    if (existing?.provider === "mux") {
+      if (existing.videoRef !== data.videoRef) await deleteMuxByRef(existing.videoRef);
+    } else {
+      await purgeIfReplaced(existing?.videoRef, data.videoRef); // purgeMedia YouTube/Vimeo'yu yutar
+    }
+    await purgeIfReplaced(existing?.thumbUrl, data.thumbUrl); // Mux thumb URL'i Cloudinary'de yoktur → sessizce geçer
+  } else {
+    await prisma.ceyhunVideo.create({ data });
+  }
   revalidateAll("/videos");
   return { ok: true };
 }
 
 export async function deleteVideo(id: string): Promise<AdminResult> {
   await requireEditor();
+  const row = await prisma.ceyhunVideo.findUnique({
+    where: { id },
+    select: { provider: true, videoRef: true, thumbUrl: true },
+  });
   await prisma.ceyhunVideo.delete({ where: { id } });
+  // Kendi yüklediğimiz videoları (mux/mediaserver/cloudinary/local) + posterlerini temizle.
+  // YouTube/Vimeo'da videoRef bir bağlantıdır, purgeMedia sessizce geçer.
+  if (row?.provider === "mux") await deleteMuxByRef(row.videoRef);
+  else if (row?.provider === "mediaserver" || row?.provider === "cloudinary" || row?.provider === "local")
+    await purgeMedia(row.videoRef);
+  await purgeMedia(row?.thumbUrl);
   revalidateAll("/videos");
   return { ok: true };
 }
@@ -212,8 +273,13 @@ export async function saveAlbum(_prev: AdminResult, fd: FormData): Promise<Admin
     published: fd.get("published") === "on",
   };
 
-  if (id) await prisma.ceyhunAlbum.update({ where: { id }, data });
-  else await prisma.ceyhunAlbum.create({ data });
+  if (id) {
+    const existing = await prisma.ceyhunAlbum.findUnique({ where: { id }, select: { coverUrl: true } });
+    await prisma.ceyhunAlbum.update({ where: { id }, data });
+    await purgeIfReplaced(existing?.coverUrl, data.coverUrl); // albüm kapağı değiştiyse eskisini sil
+  } else {
+    await prisma.ceyhunAlbum.create({ data });
+  }
   revalidateAll("/gallery");
   return { ok: true };
 }
@@ -221,7 +287,9 @@ export async function saveAlbum(_prev: AdminResult, fd: FormData): Promise<Admin
 export async function deleteAlbum(id: string): Promise<AdminResult> {
   await requireEditor();
   // Albüme bağlı fotoların albnumId'sini boşalt (SetNull ilişkisi zaten var), sonra sil.
+  const row = await prisma.ceyhunAlbum.findUnique({ where: { id }, select: { coverUrl: true } });
   await prisma.ceyhunAlbum.delete({ where: { id } });
+  await purgeMedia(row?.coverUrl); // fotolar kalır, yalnızca albüm kapağını temizle
   revalidateAll("/gallery");
   return { ok: true };
 }
@@ -257,7 +325,9 @@ export async function addPhotos(albumId: string | null, urls: string[]): Promise
 
 export async function deletePhoto(id: string): Promise<AdminResult> {
   await requireEditor();
+  const row = await prisma.ceyhunPhoto.findUnique({ where: { id }, select: { url: true } });
   await prisma.ceyhunPhoto.delete({ where: { id } });
+  await purgeMedia(row?.url); // görseli Cloudinary'den / diskten de sil
   revalidateAll("/gallery");
   return { ok: true };
 }
@@ -312,15 +382,29 @@ export async function saveCourse(_prev: AdminResult, fd: FormData): Promise<Admi
     order: num(fd.get("order")),
   };
 
-  if (id) await prisma.ceyhunCourse.update({ where: { id }, data });
-  else await prisma.ceyhunCourse.create({ data });
+  if (id) {
+    const existing = await prisma.ceyhunCourse.findUnique({ where: { id }, select: { coverUrl: true } });
+    await prisma.ceyhunCourse.update({ where: { id }, data });
+    await purgeIfReplaced(existing?.coverUrl, data.coverUrl); // kurs kapağı değiştiyse eskisini sil
+  } else {
+    await prisma.ceyhunCourse.create({ data });
+  }
   revalidateAll("/courses");
   return { ok: true };
 }
 
 export async function deleteCourse(id: string): Promise<AdminResult> {
   await requireEditor();
+  // Kapak + derslerin (cloudinary/local) videolarını da temizle.
+  const course = await prisma.ceyhunCourse.findUnique({ where: { id }, select: { coverUrl: true } });
+  const lessons = await prisma.ceyhunLesson.findMany({ where: { courseId: id }, select: { provider: true, videoRef: true } });
   await prisma.ceyhunCourse.delete({ where: { id } }); // dersler Cascade ile silinir
+  await purgeMedia(course?.coverUrl);
+  for (const l of lessons) {
+    if (l.provider === "mux") await deleteMuxByRef(l.videoRef);
+    else if (l.provider === "mediaserver" || l.provider === "cloudinary" || l.provider === "local")
+      await purgeMedia(l.videoRef);
+  }
   revalidateAll("/courses");
   return { ok: true };
 }
@@ -346,15 +430,29 @@ export async function saveLesson(_prev: AdminResult, fd: FormData): Promise<Admi
     order: num(fd.get("order")),
   };
 
-  if (id) await prisma.ceyhunLesson.update({ where: { id }, data });
-  else await prisma.ceyhunLesson.create({ data });
+  if (id) {
+    const existing = await prisma.ceyhunLesson.findUnique({ where: { id }, select: { provider: true, videoRef: true } });
+    await prisma.ceyhunLesson.update({ where: { id }, data });
+    // Ders videosu değiştiyse eskisini kaynağından sil.
+    if (existing?.provider === "mux") {
+      if (existing.videoRef !== data.videoRef) await deleteMuxByRef(existing.videoRef);
+    } else {
+      await purgeIfReplaced(existing?.videoRef, data.videoRef);
+    }
+  } else {
+    await prisma.ceyhunLesson.create({ data });
+  }
   revalidateAll("/courses");
   return { ok: true };
 }
 
 export async function deleteLesson(id: string): Promise<AdminResult> {
   await requireEditor();
+  const row = await prisma.ceyhunLesson.findUnique({ where: { id }, select: { provider: true, videoRef: true } });
   await prisma.ceyhunLesson.delete({ where: { id } });
+  if (row?.provider === "mux") await deleteMuxByRef(row.videoRef);
+  else if (row?.provider === "mediaserver" || row?.provider === "cloudinary" || row?.provider === "local")
+    await purgeMedia(row.videoRef);
   revalidateAll("/courses");
   return { ok: true };
 }
@@ -391,8 +489,13 @@ export async function saveMeeting(_prev: AdminResult, fd: FormData): Promise<Adm
     published: fd.get("published") === "on",
   };
 
-  if (id) await prisma.ceyhunPrayerMeeting.update({ where: { id }, data });
-  else await prisma.ceyhunPrayerMeeting.create({ data: { ...data, streamCallId: `prayer-${slug}-${Date.now().toString(36)}` } });
+  if (id) {
+    const existing = await prisma.ceyhunPrayerMeeting.findUnique({ where: { id }, select: { coverUrl: true } });
+    await prisma.ceyhunPrayerMeeting.update({ where: { id }, data });
+    await purgeIfReplaced(existing?.coverUrl, data.coverUrl); // toplantı kapağı değiştiyse eskisini sil
+  } else {
+    await prisma.ceyhunPrayerMeeting.create({ data: { ...data, streamCallId: `prayer-${slug}-${Date.now().toString(36)}` } });
+  }
   revalidateAll("/prayer");
   return { ok: true };
 }
@@ -407,7 +510,9 @@ export async function updateMeetingStatus(id: string, status: string): Promise<A
 
 export async function deleteMeeting(id: string): Promise<AdminResult> {
   await requirePrayer();
+  const row = await prisma.ceyhunPrayerMeeting.findUnique({ where: { id }, select: { coverUrl: true } });
   await prisma.ceyhunPrayerMeeting.delete({ where: { id } });
+  await purgeMedia(row?.coverUrl); // toplantı kapağını da temizle
   revalidateAll("/prayer");
   return { ok: true };
 }

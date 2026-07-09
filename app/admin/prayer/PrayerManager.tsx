@@ -3,8 +3,9 @@
 // app/admin/prayer/PrayerManager.tsx
 // Online dua toplantıları: planla/düzenle/sil, CANLI yap / bitir, kayıt & dua isteklerini gör.
 
+import Link from "next/link";
 import { useActionState, useEffect, useState, useTransition } from "react";
-import { Plus, Pencil, Trash2, X, Save, EyeOff, ChevronDown, Radio, Square, MessageCircleHeart } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, EyeOff, ChevronDown, Radio, Square, MessageCircleHeart, Video } from "lucide-react";
 import { saveMeeting, deleteMeeting, updateMeetingStatus, type AdminResult } from "../ceyhun-actions";
 import { formatDate } from "../_ui";
 import MultiLangField from "../_components/MultiLangField";
@@ -45,6 +46,9 @@ export default function PrayerManager({ items }: { items: MeetingDTO[] }) {
                   <p className="truncate text-xs text-ink/40">{m.scheduledAtLabel} · {m.registrations.length} kayıt</p>
                 </div>
                 {!m.published && <EyeOff className="h-4 w-4 shrink-0 text-ink/30" />}
+                <Link href={`/admin/prayer/live/${m.id}`} className="inline-flex items-center gap-1.5 rounded-full bg-ceyhun-ink px-3 py-1.5 text-xs font-semibold text-white hover:bg-ceyhun-gold-deep" title="Kameradan canlı yayın aç">
+                  <Video className="h-3 w-3" /> Yayını Yönet
+                </Link>
                 {live ? (
                   <button disabled={busy} onClick={() => start(() => void updateMeetingStatus(m.id, "ENDED"))} className="inline-flex items-center gap-1.5 rounded-full bg-gray-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-black"><Square className="h-3 w-3" /> Bitir</button>
                 ) : (

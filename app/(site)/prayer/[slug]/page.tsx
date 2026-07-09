@@ -6,6 +6,7 @@ import { getMeetingBySlug } from "@/app/lib/ceyhun-data";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
 import { pick, safeObject } from "@/app/lib/ceyhun";
 import PrayerRoom from "@/app/components/ceyhun/PrayerRoom";
+import LiveRoom from "@/app/components/ceyhun/live/LiveRoom";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,9 @@ export default async function PrayerRoomPage({ params }: { params: Promise<{ slu
   const m = await getMeetingBySlug(slug);
   if (!m || !m.published) notFound();
 
-  const joinInfo = safeObject<{ embedUrl?: string | null }>(m.joinInfo);
+  const joinInfo = safeObject<{ embedUrl?: string | null; mode?: string }>(m.joinInfo);
+  // Varsayılan: yerleşik WebRTC canlı yayın. Yalnız mode="youtube" + embedUrl ise eski gömülü oynatıcı.
+  const useYoutube = joinInfo.mode === "youtube" && Boolean(joinInfo.embedUrl);
   const fmt = new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "de" ? "de-DE" : "tr-TR", {
     weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
   }).format(m.scheduledAt);
@@ -31,12 +34,16 @@ export default async function PrayerRoomPage({ params }: { params: Promise<{ slu
         {pick(m.description, locale) && <p className="mt-3 max-w-2xl text-ceyhun-slate">{pick(m.description, locale)}</p>}
       </div>
 
-      <PrayerRoom
-        meetingId={m.id}
-        title={pick(m.title, locale)}
-        embedUrl={joinInfo.embedUrl ?? null}
-        isLive={m.status === "LIVE"}
-      />
+      {useYoutube ? (
+        <PrayerRoom
+          meetingId={m.id}
+          title={pick(m.title, locale)}
+          embedUrl={joinInfo.embedUrl ?? null}
+          isLive={m.status === "LIVE"}
+        />
+      ) : (
+        <LiveRoom meetingId={m.id} title={pick(m.title, locale)} />
+      )}
     </div>
   );
 }
