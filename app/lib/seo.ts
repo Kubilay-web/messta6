@@ -45,21 +45,21 @@ const CEYHUN: Record<Locale, Brand> = {
     name: "Avrupa Uyanış Hizmetleri",
     title: "Avrupa Uyanış Hizmetleri — Vaaz, Biblical Tur & Online Dua",
     description:
-      "Avrupa Uyanış Hizmetleri: Kutsal Kitap'ın izinde vaazlar, yazılar ve videolar; İstanbul, 7 Kilise ve Kapadokya için biblical tur başvurusu; online eğitim, dua toplantıları ve yapay zekâ destekli iman asistanı.",
+      "Avrupa Uyanış Hizmetleri: Kutsal Kitap'ın izinde vaazlar, yazılar ve videolar; İstanbul, 7 Kilise ve Kapadokya için biblical tur başvurusu; online eğitim, dua toplantıları ve yapay zekâ destekli asistan.",
     keywords: ["Avrupa Uyanış Hizmetleri", "kilise vaizi", "biblical turizm", "7 kilise turu", "İstanbul turu", "Kapadokya turu", "hristiyan vaaz", "online dua"],
   },
   en: {
     name: "Avrupa Uyanış Hizmetleri",
     title: "Avrupa Uyanış Hizmetleri — European Awakening Services",
     description:
-      "Avrupa Uyanış Hizmetleri (European Awakening Services): sermons, writings and videos in the footsteps of the Scriptures; apply for Istanbul, Seven Churches and Cappadocia biblical tours; online courses, prayer meetings and an AI faith assistant.",
+      "Avrupa Uyanış Hizmetleri (European Awakening Services): sermons, writings and videos in the footsteps of the Scriptures; apply for Istanbul, Seven Churches and Cappadocia biblical tours; online courses, prayer meetings and an AI assistant.",
     keywords: ["Avrupa Uyanış Hizmetleri", "European Awakening Services", "church preacher", "biblical tourism", "seven churches tour", "Istanbul tour", "Cappadocia tour", "online prayer"],
   },
   de: {
     name: "Avrupa Uyanış Hizmetleri",
     title: "Avrupa Uyanış Hizmetleri — Europäische Erweckungsdienste",
     description:
-      "Avrupa Uyanış Hizmetleri (Europäische Erweckungsdienste): Predigten, Schriften und Videos auf den Spuren der Schrift; Bewerbung für Istanbul-, Sieben-Kirchen- und Kappadokien-Touren; Online-Kurse, Gebetstreffen und ein KI-Glaubensassistent.",
+      "Avrupa Uyanış Hizmetleri (Europäische Erweckungsdienste): Predigten, Schriften und Videos auf den Spuren der Schrift; Bewerbung für Istanbul-, Sieben-Kirchen- und Kappadokien-Touren; Online-Kurse, Gebetstreffen und ein KI-Assistent.",
     keywords: ["Avrupa Uyanış Hizmetleri", "Europäische Erweckungsdienste", "Kirchenprediger", "biblischer Tourismus", "Sieben-Kirchen-Tour", "Istanbul-Tour", "Kappadokien-Tour", "Online-Gebet"],
   },
 };

@@ -1,4 +1,4 @@
-// app/(site)/asistan/page.tsx — İman Asistanı (ElevenLabs sesli AI) tanıtım sayfası.
+// app/(site)/asistan/page.tsx — Asistan (ElevenLabs sesli AI) tanıtım sayfası.
 // Sesli widget (VoiceAssistant) global olarak sağ altta mount edilir; bu sayfa onu tanıtır.
 import type { Metadata } from "next";
 import { Sparkles, Mic, MessageCircleHeart, BookOpen, ArrowDownRight } from "lucide-react";
@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 
 const COPY = {
   tr: {
-    badge: "Yapay Zekâ · İman Asistanı",
-    title: "İman Asistanı ile konuşun",
+    badge: "Yapay Zekâ · Asistan",
+    title: "Asistan ile konuşun",
     lead: "Avrupa Uyanış Hizmetleri'nin sesli yapay zekâ asistanı. Kutsal Kitap, dua, iman ve hizmetlerimiz hakkında merak ettiklerinizi sesli olarak sorabilirsiniz — gündüz ya da gece.",
     ctaTitle: "Nasıl başlarım?",
     ctaText: "Sağ alttaki asistan düğmesine dokunun, mikrofon izni verin ve konuşmaya başlayın.",
@@ -21,8 +21,8 @@ const COPY = {
     hint: "Asistan düğmesi sağ altta",
   },
   en: {
-    badge: "AI · Faith Assistant",
-    title: "Talk to the Faith Assistant",
+    badge: "AI · Assistant",
+    title: "Talk to the Assistant",
     lead: "The voice AI assistant of Avrupa Uyanış Hizmetleri. Ask anything about the Scriptures, prayer, faith and our ministry — out loud, day or night.",
     ctaTitle: "How do I start?",
     ctaText: "Tap the assistant button at the bottom-right, allow microphone access and start speaking.",
@@ -34,8 +34,8 @@ const COPY = {
     hint: "The assistant button is at the bottom-right",
   },
   de: {
-    badge: "KI · Glaubensassistent",
-    title: "Sprechen Sie mit dem Glaubensassistenten",
+    badge: "KI · Assistent",
+    title: "Sprechen Sie mit dem Assistenten",
     lead: "Der KI-Sprachassistent von Avrupa Uyanış Hizmetleri. Fragen Sie alles über die Schrift, Gebet, Glauben und unseren Dienst — laut, Tag und Nacht.",
     ctaTitle: "Wie fange ich an?",
     ctaText: "Tippen Sie unten rechts auf die Assistenten-Schaltfläche, erlauben Sie den Mikrofonzugriff und sprechen Sie.",

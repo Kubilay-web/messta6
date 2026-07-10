@@ -1,7 +1,7 @@
 "use client";
 
 // app/components/ceyhun/VoiceAssistant.tsx
-// Avrupa Uyanış Hizmetleri "İman Asistanı" — ElevenLabs Conversational AI gömülü widget'ı.
+// Avrupa Uyanış Hizmetleri "Asistan" — ElevenLabs Conversational AI gömülü widget'ı.
 // Sitenin her (herkese açık) sayfasında sağ altta sabit sesli asistan olarak görünür.
 // Custom element JSX tipini gerektirmesin diye React.createElement ile render edilir.
 
