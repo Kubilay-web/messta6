@@ -176,3 +176,6 @@ html, body { overflow-x: clip; max-width: 100%; }
 h1.font-syne, h2.font-syne, h3.font-syne { overflow-wrap: break-word; }
 // Medya varsayılan olarak kapsayıcıyı aşmasın.
 img, video, iframe { max-width: 100%; }
+
+// Mobil menü açıkken sesli asistan (ElevenLabs) widget'ını gizle — üst üste binmesin.
+body.mobile-nav-open elevenlabs-convai { display: none !important; }

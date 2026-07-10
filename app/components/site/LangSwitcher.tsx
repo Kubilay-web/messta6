@@ -14,10 +14,12 @@ export default function LangSwitcher({
   variant = "light",
   className = "",
   align = "right",
+  openUp = false,
 }: {
   variant?: "light" | "dark";
   className?: string;
   align?: "left" | "right";
+  openUp?: boolean;
 }) {
   const lang = useClientLocale();
   const switchLocale = useLocaleSwitch();
@@ -53,7 +55,7 @@ export default function LangSwitcher({
       </button>
       {open && (
         <div
-          className={`absolute ${align === "left" ? "left-0" : "right-0"} z-[80] mt-2 w-40 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border py-1 shadow-xl ${
+          className={`absolute ${align === "left" ? "left-0" : "right-0"} ${openUp ? "bottom-full mb-2" : "top-full mt-2"} z-[80] w-40 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border py-1 shadow-xl ${
             dark ? "border-white/10 bg-ink text-paper" : "border-ink/10 bg-white text-ink"
           }`}
         >

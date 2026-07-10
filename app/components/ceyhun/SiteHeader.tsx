@@ -25,6 +25,12 @@ export default function SiteHeader({ name }: { name: string }) {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  // Mobil menü açıkken sesli asistan widget'ını gizle (üst üste binmesin).
+  useEffect(() => {
+    document.body.classList.toggle("mobile-nav-open", open);
+    return () => document.body.classList.remove("mobile-nav-open");
+  }, [open]);
+
   const links = [
     { href: "/", label: t.nav.home },
     { href: "/about", label: t.nav.about },
@@ -103,7 +109,7 @@ export default function SiteHeader({ name }: { name: string }) {
               </Link>
             ))}
             <div className="mt-2 flex items-center justify-between border-t border-ceyhun-ink/10 pt-3">
-              <LangSwitcher align="left" />
+              <LangSwitcher align="left" openUp />
               <Link href="/donate" className="inline-flex items-center gap-1.5 rounded-full bg-ceyhun-gold px-4 py-2 text-sm font-semibold text-ceyhun-ink">
                 <HandHeart className="h-4 w-4" /> {t.nav.donate}
               </Link>
