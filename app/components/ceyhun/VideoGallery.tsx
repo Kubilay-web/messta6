@@ -6,7 +6,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
-import { pick, videoThumb, videoEmbedUrl, isDirectVideo, isMuxProvider, parseMuxRef, type Locale } from "@/app/lib/ceyhun";
+import { pick, muxThumb, parseMuxRef, type Locale } from "@/app/lib/ceyhun";
 import MuxVideo from "./MuxVideo";
 
 export type PublicVideo = {
@@ -30,7 +30,7 @@ export default function VideoGallery({ videos, locale }: { videos: PublicVideo[]
     <>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((v) => {
-          const thumb = videoThumb(v.provider, v.videoRef, v.thumbUrl);
+          const thumb = v.thumbUrl || muxThumb(v.videoRef);
           const title = pick(v.title, locale);
           return (
             <button
@@ -60,18 +60,7 @@ export default function VideoGallery({ videos, locale }: { videos: PublicVideo[]
           </button>
           <div className="w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <div className="relative aspect-video overflow-hidden rounded-2xl bg-black shadow-2xl">
-              {isMuxProvider(active.provider) ? (
-                <MuxVideo playbackId={parseMuxRef(active.videoRef).playbackId} title={pick(active.title, locale)} autoPlay />
-              ) : isDirectVideo(active.provider) ? (
-                <video src={active.videoRef} controls autoPlay className="h-full w-full" />
-              ) : (
-                <iframe
-                  src={`${videoEmbedUrl(active.provider, active.videoRef)}?autoplay=1`}
-                  className="h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              )}
+              <MuxVideo playbackId={parseMuxRef(active.videoRef).playbackId} title={pick(active.title, locale)} autoPlay />
             </div>
             <h3 className="mt-4 font-syne text-xl font-bold text-white">{pick(active.title, locale)}</h3>
             {pick(active.description, locale) && (

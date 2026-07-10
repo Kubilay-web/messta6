@@ -202,12 +202,12 @@ export async function saveVideo(_prev: AdminResult, fd: FormData): Promise<Admin
   if (!unpackLang(title).tr && !unpackLang(title).en)
     return { ok: false, message: "Başlık zorunlu." };
   const videoRef = String(fd.get("videoRef") ?? "").trim();
-  if (!videoRef) return { ok: false, message: "Video bağlantısı/kimliği zorunlu." };
+  if (!videoRef) return { ok: false, message: "Önce videoyu Mux'a yükleyin." };
 
   const data = {
     title,
     description: packLangFromForm(fd, "description"),
-    provider: String(fd.get("provider") ?? "youtube").trim() || "youtube",
+    provider: "mux",
     videoRef,
     thumbUrl: String(fd.get("thumbUrl") ?? "").trim() || null,
     category: String(fd.get("category") ?? "").trim() || null,
@@ -417,13 +417,13 @@ export async function saveLesson(_prev: AdminResult, fd: FormData): Promise<Admi
   const title = packLangFromForm(fd, "title");
   if (!unpackLang(title).tr && !unpackLang(title).en) return { ok: false, message: "Ders başlığı zorunlu." };
   const videoRef = String(fd.get("videoRef") ?? "").trim();
-  if (!videoRef) return { ok: false, message: "Video bağlantısı zorunlu." };
+  if (!videoRef) return { ok: false, message: "Önce videoyu Mux'a yükleyin." };
 
   const data = {
     courseId,
     title,
     description: packLangFromForm(fd, "description"),
-    provider: String(fd.get("provider") ?? "youtube").trim() || "youtube",
+    provider: "mux",
     videoRef,
     durationSec: num(fd.get("durationSec")),
     isFreePreview: fd.get("isFreePreview") === "on",

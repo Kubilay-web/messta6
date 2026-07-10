@@ -7517,8 +7517,8 @@ model CeyhunVideo {
   id          String   @id @default(cuid()) @map("_id")
   title       String   @default("{}")
   description String   @default("{}")
-  provider    String   @default("youtube") // youtube | cloudinary | vimeo
-  videoRef    String // youtube id ya da tam url
+  provider    String   @default("mux") // yalnızca mux
+  videoRef    String // "<assetId>:<playbackId>"
   thumbUrl    String?
   category    String?
   durationSec Int      @default(0)
@@ -7611,7 +7611,7 @@ model CeyhunLesson {
   course        CeyhunCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
   title         String       @default("{}")
   description   String       @default("{}")
-  provider      String       @default("youtube")
+  provider      String       @default("mux") // yalnızca mux
   videoRef      String
   durationSec   Int          @default(0)
   isFreePreview Boolean      @default(false)

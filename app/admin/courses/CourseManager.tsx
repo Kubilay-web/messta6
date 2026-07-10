@@ -9,7 +9,6 @@ import { saveCourse, deleteCourse, saveLesson, deleteLesson, type AdminResult } 
 import MultiLangField from "../_components/MultiLangField";
 import RichTextField from "../_components/RichTextField";
 import ImageUpload from "../_components/ImageUpload";
-import VideoUpload from "../_components/VideoUpload";
 import MuxVideoUpload from "../_components/MuxVideoUpload";
 
 type Lang = { tr: string; en: string; de: string };
@@ -129,13 +128,10 @@ function LessonPanel({ course }: { course: CourseDTO }) {
 // ─── Ders ekle/düzenle (kontrollü: Mux yükleme için kaynak+videoRef+süre state'te) ───
 function LessonForm({ editing, courseId, onClose }: { editing: LessonDTO; courseId: string; onClose: () => void }) {
   const [state, formAction, pending] = useActionState(saveLesson, initial);
-  const [provider, setProvider] = useState(editing.provider || "mux");
   const [videoRef, setVideoRef] = useState(editing.videoRef || "");
   const [durationSec, setDurationSec] = useState(editing.durationSec || 0);
   useEffect(() => { if (state.ok) onClose(); }, [state, onClose]);
   const inp = "w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold";
-  const isMux = provider === "mux";
-  const isUpload = provider === "mediaserver" || provider === "cloudinary";
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
@@ -146,38 +142,26 @@ function LessonForm({ editing, courseId, onClose }: { editing: LessonDTO; course
         </div>
         <input type="hidden" name="courseId" value={courseId} />
         {editing.id && <input type="hidden" name="id" value={editing.id} />}
-        {/* Kontrollü alanlar → action'a taşınır */}
+        {/* Kontrollü alanlar → action'a taşınır (yalnızca Mux) */}
+        <input type="hidden" name="provider" value="mux" readOnly />
         <input type="hidden" name="videoRef" value={videoRef} readOnly />
         <input type="hidden" name="durationSec" value={String(durationSec)} readOnly />
 
         <div className="grid grid-cols-2 gap-4">
-          <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Kaynak</span>
-            <select name="provider" value={provider} onChange={(e) => setProvider(e.target.value)} className={inp}>
-              <option value="mux">Mux (yükle · adaptif · önerilen)</option>
-              <option value="mediaserver">Kendi sunucum / MP4</option>
-              <option value="youtube">YouTube</option>
-              <option value="vimeo">Vimeo</option>
-            </select></label>
+          <div className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Kaynak</span>
+            <div className="flex items-center gap-2 rounded-lg border border-black/10 bg-ceyhun-cream-deep/40 px-3 py-2 text-sm">
+              <span className="rounded-full bg-ceyhun-ink px-2 py-0.5 text-[10px] font-semibold uppercase text-white">Mux</span>
+              <span className="text-ink/60">Yükle · adaptif</span>
+            </div></div>
           <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Sıra</span><input name="order" type="number" defaultValue={String(editing.order)} className={inp} /></label>
         </div>
 
-        {/* Kaynağa göre: Mux yükleyici / kendi sunucu yükleyici / bağlantı alanı */}
-        {isMux ? (
-          <div className="mt-4">
-            <MuxVideoUpload value={videoRef}
-              onUploaded={({ videoRef: ref, durationSec: d }) => { setVideoRef(ref); if (d) setDurationSec(d); }}
-              onClear={() => setVideoRef("")} />
-          </div>
-        ) : isUpload ? (
-          <div className="mt-4">
-            <VideoUpload value={videoRef}
-              onUploaded={({ url, durationSec: d }) => { setVideoRef(url); if (d) setDurationSec(d); }}
-              onClear={() => setVideoRef("")} />
-          </div>
-        ) : (
-          <label className="mt-4 block"><span className="mb-1 block text-xs font-medium text-ink/50">Video bağlantısı / kimliği *</span>
-            <input value={videoRef} onChange={(e) => setVideoRef(e.target.value)} placeholder="https://youtu.be/…" className={inp} /></label>
-        )}
+        {/* Video dosyası doğrudan Mux'a yüklenir */}
+        <div className="mt-4">
+          <MuxVideoUpload value={videoRef}
+            onUploaded={({ videoRef: ref, durationSec: d }) => { setVideoRef(ref); if (d) setDurationSec(d); }}
+            onClear={() => setVideoRef("")} />
+        </div>
 
         <MultiLangField base="title" label="Ders başlığı" value={editing.title} required />
         <MultiLangField base="description" label="Açıklama" value={editing.description} textarea rows={2} />

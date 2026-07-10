@@ -1,8 +1,8 @@
 "use client";
 
 // app/admin/videos/VideoManager.tsx
-// Video yönetimi: YouTube/Vimeo (embed) + kendi yüklemen (Cloudinary'ye doğrudan yükleme).
-// Kaynak "cloudinary" seçilince dosya yükleyici çıkar; videoRef/küçük resim/süre otomatik dolar.
+// Video yönetimi: yalnızca Mux. Video dosyası doğrudan Mux'a yüklenir;
+// videoRef ("<assetId>:<playbackId>") / küçük resim / süre otomatik dolar.
 
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { Plus, Pencil, Trash2, X, Save, EyeOff, Star, Play } from "lucide-react";
@@ -11,7 +11,6 @@ import { saveVideo, deleteVideo, type AdminResult } from "../ceyhun-actions";
 import { videoThumb } from "@/app/lib/ceyhun";
 import MultiLangField from "../_components/MultiLangField";
 import ImageUpload from "../_components/ImageUpload";
-import VideoUpload from "../_components/VideoUpload";
 import MuxVideoUpload from "../_components/MuxVideoUpload";
 
 type Lang = { tr: string; en: string; de: string };
@@ -35,7 +34,7 @@ const empty: VideoDTO = {
   id: "",
   title: { tr: "", en: "", de: "" },
   description: { tr: "", en: "", de: "" },
-  provider: "youtube",
+  provider: "mux",
   videoRef: "",
   thumbUrl: null,
   category: "",
@@ -131,13 +130,9 @@ function VideoEditor({
   pending: boolean;
   onClose: () => void;
 }) {
-  const [provider, setProvider] = useState(editing.provider || "youtube");
   const [videoRef, setVideoRef] = useState(editing.videoRef || "");
   const [thumbUrl, setThumbUrl] = useState(editing.thumbUrl ?? "");
   const [durationSec, setDurationSec] = useState(editing.durationSec || 0);
-  const isMux = provider === "mux";
-  // Kendi medya sunucumuza yükleme (yeni: "mediaserver"; eski kayıtlar "cloudinary" olabilir).
-  const isUpload = provider === "mediaserver" || provider === "cloudinary";
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
@@ -149,21 +144,19 @@ function VideoEditor({
         {editing.id && <input type="hidden" name="id" value={editing.id} />}
 
         {/* Server action'a taşınan gizli alanlar (kontrollü) */}
+        <input type="hidden" name="provider" value="mux" readOnly />
         <input type="hidden" name="videoRef" value={videoRef} readOnly />
         <input type="hidden" name="thumbUrl" value={thumbUrl} readOnly />
         <input type="hidden" name="durationSec" value={String(durationSec)} readOnly />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="mb-1 block text-xs font-medium text-ink/50">Kaynak *</span>
-            <select name="provider" value={provider} onChange={(e) => setProvider(e.target.value)}
-              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-ceyhun-gold">
-              <option value="mux">Mux (yükle · adaptif · önerilen)</option>
-              <option value="mediaserver">Kendi sunucum (dosya yükleme)</option>
-              <option value="youtube">YouTube</option>
-              <option value="vimeo">Vimeo</option>
-            </select>
-          </label>
+          <div className="block">
+            <span className="mb-1 block text-xs font-medium text-ink/50">Kaynak</span>
+            <div className="flex items-center gap-2 rounded-lg border border-black/10 bg-ceyhun-cream-deep/40 px-3 py-2 text-sm">
+              <span className="rounded-full bg-ceyhun-ink px-2 py-0.5 text-[10px] font-semibold uppercase text-white">Mux</span>
+              <span className="text-ink/60">Yükle · adaptif akış</span>
+            </div>
+          </div>
           <label className="block">
             <span className="mb-1 block text-xs font-medium text-ink/50">Sıra</span>
             <input name="order" type="number" defaultValue={String(editing.order)}
@@ -171,38 +164,18 @@ function VideoEditor({
           </label>
         </div>
 
-        {/* Kaynağa göre: Mux yükleyici / kendi sunucu yükleyici / bağlantı alanı */}
-        {isMux ? (
-          <div className="mt-4">
-            <MuxVideoUpload
-              value={videoRef}
-              onUploaded={({ videoRef: ref, thumbUrl: tb, durationSec: d }) => {
-                setVideoRef(ref);
-                setThumbUrl((prev) => prev || tb); // elle küçük resim konmadıysa Mux otomatiğini kullan
-                if (d) setDurationSec(d);
-              }}
-              onClear={() => setVideoRef("")}
-            />
-          </div>
-        ) : isUpload ? (
-          <div className="mt-4">
-            <VideoUpload
-              value={videoRef}
-              onUploaded={({ url, thumbUrl: tb, durationSec: d }) => {
-                setVideoRef(url);
-                setThumbUrl((prev) => prev || tb); // elle küçük resim konmadıysa otomatiği kullan
-                if (d) setDurationSec(d);
-              }}
-              onClear={() => setVideoRef("")}
-            />
-          </div>
-        ) : (
-          <label className="mt-4 block">
-            <span className="mb-1 block text-xs font-medium text-ink/50">Video bağlantısı / kimliği *</span>
-            <input value={videoRef} onChange={(e) => setVideoRef(e.target.value)} placeholder="https://youtu.be/… veya video ID"
-              className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
-          </label>
-        )}
+        {/* Video dosyası doğrudan Mux'a yüklenir */}
+        <div className="mt-4">
+          <MuxVideoUpload
+            value={videoRef}
+            onUploaded={({ videoRef: ref, thumbUrl: tb, durationSec: d }) => {
+              setVideoRef(ref);
+              setThumbUrl((prev) => prev || tb); // elle küçük resim konmadıysa Mux otomatiğini kullan
+              if (d) setDurationSec(d);
+            }}
+            onClear={() => setVideoRef("")}
+          />
+        </div>
 
         <MultiLangField base="title" label="Başlık" value={editing.title} required />
         <MultiLangField base="description" label="Açıklama" value={editing.description} textarea rows={2} />
