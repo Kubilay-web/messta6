@@ -4,6 +4,7 @@ import { getCeyhunT } from "@/app/lib/ceyhunT";
 import { getPublishedAlbums, getPublishedPhotos } from "@/app/lib/ceyhun-data";
 import { pick } from "@/app/lib/ceyhun";
 import PhotoGallery from "@/app/components/ceyhun/PhotoGallery";
+import { PageHero } from "@/app/components/ceyhun/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +16,9 @@ export default async function GalleryPage() {
   const hasAny = albums.some((a) => a.photos.length > 0) || loose.length > 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-      <header className="mb-10">
-        <h1 className="font-syne text-4xl font-extrabold tracking-tight text-ceyhun-ink sm:text-5xl">{t.gallery.title}</h1>
-        <p className="mt-3 text-lg text-ceyhun-slate">{t.gallery.subtitle}</p>
-      </header>
-
+    <>
+      <PageHero eyebrow={t.gallery.eyebrow} title={t.gallery.title} subtitle={t.gallery.subtitle} />
+      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
       {!hasAny && (
         <p className="rounded-2xl border border-dashed border-ceyhun-ink/15 py-20 text-center text-ceyhun-ink/40">{t.common.empty}</p>
       )}
@@ -43,6 +41,7 @@ export default async function GalleryPage() {
           <PhotoGallery photos={loose.map((p) => ({ id: p.id, url: p.url, caption: p.caption }))} locale={locale} />
         </section>
       )}
-    </div>
+      </div>
+    </>
   );
 }

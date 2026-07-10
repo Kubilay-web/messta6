@@ -5,7 +5,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { pick, type Locale } from "@/app/lib/ceyhun";
 
 export type PublicPhoto = { id: string; url: string; caption: string };
@@ -36,16 +36,21 @@ export default function PhotoGallery({ photos, locale }: { photos: PublicPhoto[]
     <>
       <div className="columns-2 gap-3 sm:columns-3 lg:columns-4 [&>*]:mb-3">
         {photos.map((p, i) => (
-          <button key={p.id} onClick={() => setIdx(i)} className="group block w-full overflow-hidden rounded-xl bg-ceyhun-cream-deep">
+          <button key={p.id} onClick={() => setIdx(i)} className="group block w-full overflow-hidden rounded-xl bg-ceyhun-cream-deep ring-1 ring-transparent transition-all duration-300 hover:ring-2 hover:ring-ceyhun-gold/50">
             <div className="relative w-full">
               <Image
                 src={p.url}
                 alt={pick(p.caption, locale)}
                 width={500}
                 height={500}
-                className="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 sizes="(max-width:768px) 50vw, 25vw"
               />
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ceyhun-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ceyhun-ink/30 group-hover:opacity-100">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-ceyhun-ink shadow-lg">
+                  <Maximize2 className="h-4 w-4" />
+                </span>
+              </div>
             </div>
           </button>
         ))}

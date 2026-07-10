@@ -179,3 +179,19 @@ img, video, iframe { max-width: 100%; }
 
 // Mobil menü açıkken sesli asistan (ElevenLabs) widget'ını gizle — üst üste binmesin.
 body.mobile-nav-open elevenlabs-convai { display: none !important; }
+
+// ── Genel cila: yumuşak kaydırma + erişilebilir odak halkası + hareket-azaltma saygısı ──
+html { scroll-behavior: smooth; }
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid #ffa51f;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

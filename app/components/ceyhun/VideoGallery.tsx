@@ -38,15 +38,15 @@ export default function VideoGallery({ videos, locale }: { videos: PublicVideo[]
               onClick={() => setActive(v)}
               className="group text-left"
             >
-              <div className="relative aspect-video overflow-hidden rounded-2xl bg-ceyhun-ink shadow-sm">
-                {thumb && <Image src={thumb} alt={title} fill className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-105" sizes="(max-width:768px) 100vw, 33vw" />}
-                <div className="absolute inset-0 flex items-center justify-center bg-ceyhun-ink/30 transition-colors group-hover:bg-ceyhun-ink/10">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ceyhun-gold/95 text-ceyhun-ink shadow-lg transition-transform group-hover:scale-110">
+              <div className="relative aspect-video overflow-hidden rounded-2xl bg-ceyhun-ink shadow-sm ring-1 ring-transparent transition-all duration-300 group-hover:shadow-lg group-hover:ring-2 group-hover:ring-ceyhun-gold/50">
+                {thumb && <Image src={thumb} alt={title} fill className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />}
+                <div className="absolute inset-0 flex items-center justify-center bg-ceyhun-ink/35 transition-colors duration-300 group-hover:bg-ceyhun-ink/15">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ceyhun-gold text-ceyhun-ink shadow-lg transition-transform duration-300 group-hover:scale-110">
                     <Play className="ml-0.5 h-6 w-6 fill-current" />
                   </span>
                 </div>
               </div>
-              <h3 className="mt-3 font-syne text-base font-bold leading-snug text-ceyhun-ink group-hover:text-ceyhun-gold-deep">{title}</h3>
+              <h3 className="mt-3 font-syne text-base font-bold leading-snug text-ceyhun-ink transition-colors group-hover:text-ceyhun-gold-deep">{title}</h3>
               {v.category && <p className="text-xs uppercase tracking-wide text-ceyhun-ink/40">{v.category}</p>}
             </button>
           );

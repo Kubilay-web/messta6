@@ -37,8 +37,13 @@ export default function SiteFooter({
   ];
 
   return (
-    <footer className="bg-ceyhun-ink text-white/80">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
+    <footer className="relative overflow-hidden bg-ceyhun-ink text-white/80">
+      {/* Üst ateş şeridi + ışıltılar */}
+      <div className="h-1 w-full bg-gradient-to-r from-ceyhun-gold via-ceyhun-wine to-ceyhun-olive" />
+      <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-ceyhun-gold/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-0 h-64 w-64 rounded-full bg-ceyhun-wine/10 blur-3xl" />
+
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ceyhun-gold font-syne text-sm font-extrabold text-ceyhun-ink">AU</span>
@@ -53,7 +58,9 @@ export default function SiteFooter({
         </div>
 
         <div>
-          <h4 className="font-syne text-sm font-bold uppercase tracking-wide text-white/50">Menü</h4>
+          <h4 className="flex items-center gap-2 font-syne text-sm font-bold uppercase tracking-wide text-white/50">
+            <span className="h-px w-5 bg-ceyhun-gold/60" /> Menü
+          </h4>
           <ul className="mt-3 grid grid-cols-2 gap-2 text-sm">
             {cols.map((c) => (
               <li key={c.href}><Link href={c.href} className="text-white/70 transition-colors hover:text-ceyhun-gold">{c.title}</Link></li>
@@ -62,7 +69,9 @@ export default function SiteFooter({
         </div>
 
         <div>
-          <h4 className="font-syne text-sm font-bold uppercase tracking-wide text-white/50">{t.nav.contact}</h4>
+          <h4 className="flex items-center gap-2 font-syne text-sm font-bold uppercase tracking-wide text-white/50">
+            <span className="h-px w-5 bg-ceyhun-gold/60" /> {t.nav.contact}
+          </h4>
           <ul className="mt-3 space-y-2 text-sm text-white/70">
             {email && <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-ceyhun-gold" /><a href={`mailto:${email}`} className="hover:text-ceyhun-gold">{email}</a></li>}
             {phone && <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-ceyhun-gold" /><a href={`tel:${phone}`} className="hover:text-ceyhun-gold">{phone}</a></li>}

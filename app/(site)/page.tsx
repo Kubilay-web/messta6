@@ -17,6 +17,7 @@ import { pick, safeArray } from "@/app/lib/ceyhun";
 import { SectionHeading, ArticleCard } from "@/app/components/ceyhun/ui";
 import VideoGallery from "@/app/components/ceyhun/VideoGallery";
 import PhotoGallery from "@/app/components/ceyhun/PhotoGallery";
+import Reveal from "@/app/components/ceyhun/Reveal";
 
 export const dynamic = "force-dynamic";
 
@@ -95,21 +96,23 @@ export default async function HomePage() {
       {/* ─────────── Son yazılar ─────────── */}
       {articles.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <SectionHeading eyebrow="✝" title={t.home.latestArticles} action={{ href: "/articles", label: t.common.viewAll }} />
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.map((a) => (
-              <ArticleCard
-                key={a.id}
-                href={`/articles/${a.slug}`}
-                title={pick(a.title, locale)}
-                excerpt={pick(a.excerpt, locale)}
-                cover={a.coverUrl}
-                category={a.category ?? undefined}
-                minutes={a.readMinutes}
-                minLabel={t.common.minRead}
-              />
-            ))}
-          </div>
+          <Reveal>
+            <SectionHeading eyebrow="✝" title={t.home.latestArticles} action={{ href: "/articles", label: t.common.viewAll }} />
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {articles.map((a) => (
+                <ArticleCard
+                  key={a.id}
+                  href={`/articles/${a.slug}`}
+                  title={pick(a.title, locale)}
+                  excerpt={pick(a.excerpt, locale)}
+                  cover={a.coverUrl}
+                  category={a.category ?? undefined}
+                  minutes={a.readMinutes}
+                  minLabel={t.common.minRead}
+                />
+              ))}
+            </div>
+          </Reveal>
         </section>
       )}
 
@@ -117,8 +120,10 @@ export default async function HomePage() {
       {videos.length > 0 && (
         <section className="bg-ceyhun-cream-deep/60">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-            <SectionHeading eyebrow="▶" title={t.home.featuredVideos} action={{ href: "/videos", label: t.common.viewAll }} />
-            <VideoGallery videos={videos} locale={locale} />
+            <Reveal>
+              <SectionHeading eyebrow="▶" title={t.home.featuredVideos} action={{ href: "/videos", label: t.common.viewAll }} />
+              <VideoGallery videos={videos} locale={locale} />
+            </Reveal>
           </div>
         </section>
       )}
@@ -128,7 +133,7 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute -right-24 -top-10 h-72 w-72 rounded-full bg-ceyhun-gold/25 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 left-10 h-64 w-64 rounded-full bg-ceyhun-olive/20 blur-3xl" />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+          <Reveal className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
             <div>
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-ceyhun-gold">Biblical Turizm</span>
               <h2 className="mt-3 font-syne text-3xl font-extrabold sm:text-4xl">{t.home.toursTitle}</h2>
@@ -145,18 +150,20 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ─────────── Galeri ─────────── */}
       {photos.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <SectionHeading eyebrow="◐" title={t.home.galleryTeaser} action={{ href: "/gallery", label: t.common.viewAll }} />
-          <PhotoGallery
-            photos={photos.map((p) => ({ id: p.id, url: p.url, caption: p.caption }))}
-            locale={locale}
-          />
+          <Reveal>
+            <SectionHeading eyebrow="◐" title={t.home.galleryTeaser} action={{ href: "/gallery", label: t.common.viewAll }} />
+            <PhotoGallery
+              photos={photos.map((p) => ({ id: p.id, url: p.url, caption: p.caption }))}
+              locale={locale}
+            />
+          </Reveal>
         </section>
       )}
     </>
