@@ -7441,6 +7441,7 @@ model CeyhunProfile {
   title     String   @default("{}") // ünvan (çok dilli)
   tagline   String   @default("{}") // hero alt başlık (çok dilli)
   bio       String   @default("{}") // hakkında (HTML, çok dilli)
+  about     String   @default("{}") // Hakkımızda sayfası (zengin HTML, resimli, çok dilli)
   avatarUrl String?
   coverUrl  String?
   email     String?

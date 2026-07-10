@@ -77,20 +77,21 @@ module.exports = {
         acid: "#d8f34e",
         kotapink: "#f74ea1",
         "teal-light": "#7ae3c3",
-        // ── Ceyhun Ağabey markası — vaaz / biblical turizm ağırbaşlı paleti ──
+        // ── Avrupa Uyanış Hizmetleri — Pentekostal/Evanjelist "Holy Ghost Fire" canlı paleti ──
+        // Ateşli turuncu-altın + elektrik teal + disko magenta + derin mor gece.
         // bg-ceyhun-ink, text-ceyhun-gold, bg-ceyhun-cream, border-ceyhun-gold ...
         ceyhun: {
-          ink: "#0e1524",        // derin gece-lacivert (ana koyu)
-          night: "#070c17",      // en koyu zemin
-          "ink-soft": "#1b273c",
-          gold: "#c8a25a",       // altın vurgu (aksan)
-          "gold-soft": "#e2c88f",
-          "gold-deep": "#a67f38",
-          cream: "#f7f2e7",      // parşömen zemin (açık)
-          "cream-deep": "#efe6d3",
-          olive: "#5f6b47",      // zeytin (ikincil aksan)
-          wine: "#7a3b3b",       // şarap (sıcak vurgu)
-          slate: "#586173",      // nötr metin
+          ink: "#1c1046",        // derin elektrik mor-lacivert (ana koyu / disko gece)
+          night: "#0d0524",      // en koyu zemin (mor-siyah)
+          "ink-soft": "#2e1f6e", // canlı mor (ikincil koyu)
+          gold: "#ffa51f",       // ateşli amber-altın (ANA aksan — parlak)
+          "gold-soft": "#ffd25e",// açık ışıltılı altın
+          "gold-deep": "#f4511e",// alev turuncusu (hover / vurgu)
+          cream: "#fffaf3",      // ışıklı sıcak beyaz (açık zemin)
+          "cream-deep": "#fcefdd",
+          olive: "#10b9c7",      // elektrik teal (ikincil aksan)
+          wine: "#ec3b83",       // disko magenta (sıcak vurgu)
+          slate: "#574f73",      // nötr mor-gri metin
         },
         //Chat
               backgroundImage: {

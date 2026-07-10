@@ -6,7 +6,7 @@
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Plus, Pencil, Trash2, X, Save, EyeOff, UploadCloud, Loader2, FolderOpen } from "lucide-react";
 import Image from "next/image";
-import { saveAlbum, deleteAlbum, deletePhoto, addPhotos, type AdminResult } from "../ceyhun-actions";
+import { saveAlbum, deleteAlbum, deletePhoto, addPhotos, setPhotoAlbum, type AdminResult } from "../ceyhun-actions";
 import MultiLangField from "../_components/MultiLangField";
 import ImageUpload from "../_components/ImageUpload";
 
@@ -21,6 +21,7 @@ export default function GalleryManager({ albums, photos }: { albums: AlbumDTO[];
   const [editing, setEditing] = useState<AlbumDTO | null>(null);
   const [state, formAction, pending] = useActionState(saveAlbum, initial);
   const [delPending, startDel] = useTransition();
+  const [movePending, startMove] = useTransition();
   const [filter, setFilter] = useState<string>("all"); // "all" | albumId | "none"
 
   useEffect(() => { if (state.ok) setEditing(null); }, [state]);
@@ -79,14 +80,27 @@ export default function GalleryManager({ albums, photos }: { albums: AlbumDTO[];
 
         <PhotoUploader albumId={filter !== "all" && filter !== "none" ? filter : null} />
 
-        <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+        <p className="mt-4 text-xs text-ink/40">Her fotoğrafın altındaki menüden onu bir albüme taşıyabilir (gruplandırabilir) veya albümden çıkarabilirsiniz.</p>
+        <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
           {shown.map((p) => (
-            <div key={p.id} className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-              <Image src={p.url} alt={p.caption.tr || ""} fill className="object-cover" sizes="150px" />
-              <button disabled={delPending} onClick={() => startDel(() => void deletePhoto(p.id))}
-                className="absolute right-1.5 top-1.5 rounded-lg bg-black/60 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100">
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+            <div key={p.id} className="group overflow-hidden rounded-lg border border-black/5 bg-gray-100">
+              <div className="relative aspect-square">
+                <Image src={p.url} alt={p.caption.tr || ""} fill className="object-cover" sizes="150px" />
+                <button disabled={delPending} onClick={() => startDel(() => void deletePhoto(p.id))}
+                  className="absolute right-1.5 top-1.5 rounded-lg bg-black/60 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <select
+                value={p.albumId ?? ""}
+                disabled={movePending}
+                onChange={(e) => { const v = e.target.value || null; startMove(() => void setPhotoAlbum(p.id, v)); }}
+                title="Albüm"
+                className="w-full border-t border-black/5 bg-white px-1.5 py-1 text-[11px] text-ink/70 outline-none focus:bg-ceyhun-gold/5"
+              >
+                <option value="">— Albümsüz —</option>
+                {albums.map((a) => <option key={a.id} value={a.id}>{a.title.tr || a.title.en || a.slug}</option>)}
+              </select>
             </div>
           ))}
           {shown.length === 0 && <p className="col-span-full rounded-xl border border-dashed border-black/10 px-4 py-8 text-center text-sm text-ink/40">Bu seçimde foto yok.</p>}

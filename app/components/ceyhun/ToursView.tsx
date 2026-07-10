@@ -27,11 +27,13 @@ export default function ToursView() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-ceyhun-ink text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-ceyhun-gold">Biblical Turizm</span>
-          <h1 className="mt-3 font-syne text-4xl font-extrabold tracking-tight sm:text-5xl">{t.tours.title}</h1>
-          <p className="mt-4 max-w-2xl text-white/70">{t.tours.subtitle}</p>
+      <section className="relative overflow-hidden bg-ceyhun-ink text-white">
+        <div className="pointer-events-none absolute -left-24 -top-16 h-80 w-80 rounded-full bg-ceyhun-gold/25 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-ceyhun-wine/20 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+          <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-ceyhun-gold sm:text-xs">Biblical Turizm</span>
+          <h1 className="mt-3 break-words font-syne text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl md:text-5xl">{t.tours.title}</h1>
+          <p className="mt-4 max-w-2xl text-sm text-white/70 sm:text-base">{t.tours.subtitle}</p>
         </div>
       </section>
 

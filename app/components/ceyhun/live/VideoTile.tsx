@@ -2,8 +2,11 @@
 
 // app/components/ceyhun/live/VideoTile.tsx
 // Tek bir katılımcının video/ses karosu. Video yoksa baş harf avatarı gösterir.
+// Uzaktaki ses için açık play() çağrısı yapılır; tarayıcı otomatik oynatmayı
+// engellerse (masaüstü Chrome/Firefox'ta sık) "Sesi aç" yedeği gösterilir.
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Volume2 } from "lucide-react";
 
 export default function VideoTile({
   stream,
@@ -21,10 +24,46 @@ export default function VideoTile({
   camOn?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const [needsTap, setNeedsTap] = useState(false);
+
   useEffect(() => {
     const v = ref.current;
-    if (v && v.srcObject !== stream) v.srcObject = stream;
-  }, [stream]);
+    if (!v) return;
+    if (v.srcObject !== stream) v.srcObject = stream;
+
+    // Kendi karomuz (muted) veya yayın yoksa yedeğe gerek yok.
+    if (!stream || muted) {
+      setNeedsTap(false);
+      return;
+    }
+
+    let cancelled = false;
+    const tryPlay = () => {
+      // autoPlay attribute'üne güvenme: track asenkron geldiğinden açık play() gerekir.
+      v.play()
+        .then(() => !cancelled && setNeedsTap(false))
+        .catch(() => !cancelled && setNeedsTap(true));
+    };
+
+    tryPlay();
+    // Konuşmacı sonradan mikrofon/kamera açınca (yeni track) yeniden dene.
+    stream.addEventListener("addtrack", tryPlay);
+    v.addEventListener("loadedmetadata", tryPlay);
+    return () => {
+      cancelled = true;
+      stream.removeEventListener("addtrack", tryPlay);
+      v.removeEventListener("loadedmetadata", tryPlay);
+    };
+  }, [stream, muted]);
+
+  const enableSound = useCallback(() => {
+    const v = ref.current;
+    if (!v) return;
+    v.muted = false;
+    v.play()
+      .then(() => setNeedsTap(false))
+      .catch(() => {});
+  }, []);
 
   const showVideo = Boolean(stream) && camOn;
 
@@ -43,6 +82,17 @@ export default function VideoTile({
             {name?.[0]?.toUpperCase() || "?"}
           </span>
         </div>
+      )}
+      {needsTap && (
+        <button
+          onClick={enableSound}
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-black/60 text-white backdrop-blur-sm"
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ceyhun-gold text-ceyhun-ink">
+            <Volume2 className="h-6 w-6" />
+          </span>
+          <span className="text-sm font-semibold">Sesi aç</span>
+        </button>
       )}
       <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs font-medium text-white">
         {role === "host" && <span className="text-ceyhun-gold">★</span>}

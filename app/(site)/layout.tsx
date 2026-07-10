@@ -6,6 +6,7 @@ import { getCeyhunProfile } from "@/app/lib/ceyhun-data";
 import { safeObject } from "@/app/lib/ceyhun";
 import SiteHeader from "@/app/components/ceyhun/SiteHeader";
 import SiteFooter from "@/app/components/ceyhun/SiteFooter";
+import VoiceAssistant from "@/app/components/ceyhun/VoiceAssistant";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const p = await getCeyhunProfile();
@@ -22,6 +23,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         location={p.location}
         socials={socials}
       />
+      <VoiceAssistant />
     </div>
   );
 }

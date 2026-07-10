@@ -10,7 +10,7 @@ import { resolveCeyhunRole, canAccessPanel, CEYHUN_ROLE_LABEL, visibleSections }
 import AdminSidebar from "./AdminSidebar";
 
 export const metadata = {
-  title: "Admin · Sözün İzinde",
+  title: "Admin · Avrupa Uyanış Hizmetleri",
   robots: { index: false, follow: false },
 };
 

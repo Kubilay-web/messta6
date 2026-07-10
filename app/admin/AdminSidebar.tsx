@@ -1,7 +1,7 @@
 "use client";
 
 // app/admin/AdminSidebar.tsx
-// Sözün İzinde admin paneli yan menüsü — aktif linki vurgular, mobilde açılır.
+// Avrupa Uyanış Hizmetleri admin paneli yan menüsü — aktif linki vurgular, mobilde açılır.
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,6 +9,7 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   UserCircle,
+  Info,
   FileText,
   Images,
   Video,
@@ -20,12 +21,15 @@ import {
   Menu,
   X,
   ExternalLink,
+  LogOut,
 } from "lucide-react";
+import { logout } from "@/app/(components)/(authentication-layout)/authentication/actions";
 
 // Panel (/admin) her role görünür; diğerleri `allowed` (rolün yetenekleri) ile filtrelenir.
 const NAV = [
   { href: "/admin", label: "Panel", icon: LayoutDashboard, exact: true },
   { href: "/admin/profile", label: "Profil", icon: UserCircle },
+  { href: "/admin/about", label: "Hakkımızda", icon: Info },
   { href: "/admin/articles", label: "Yazılar", icon: FileText },
   { href: "/admin/gallery", label: "Galeri", icon: Images },
   { href: "/admin/videos", label: "Videolar", icon: Video },
@@ -58,8 +62,8 @@ export default function AdminSidebar({
     <>
       {/* Mobil üst bar */}
       <div className="flex items-center justify-between border-b border-white/10 bg-ceyhun-ink px-4 py-3 text-white lg:hidden">
-        <span className="font-syne text-lg font-extrabold">
-          Sözün İzinde<span className="text-ceyhun-gold">.</span> admin
+        <span className="font-syne text-base font-extrabold">
+          Avrupa Uyanış Hizmetleri<span className="text-ceyhun-gold">.</span> admin
         </span>
         <button onClick={() => setOpen((v) => !v)} aria-label="Menü" className="rounded-lg border border-white/20 p-2">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -71,8 +75,8 @@ export default function AdminSidebar({
       >
         <div className="flex h-full flex-col">
           <div className="hidden items-center gap-2 px-6 py-6 lg:flex">
-            <span className="font-syne text-xl font-extrabold tracking-tight">
-              Sözün İzinde<span className="text-ceyhun-gold">.</span>
+            <span className="font-syne text-base font-extrabold tracking-tight leading-tight">
+              Avrupa Uyanış<br />Hizmetleri<span className="text-ceyhun-gold">.</span>
             </span>
             <span className="rounded-full bg-ceyhun-gold px-2 py-0.5 text-[11px] font-bold text-ceyhun-ink">admin</span>
           </div>
@@ -109,6 +113,14 @@ export default function AdminSidebar({
                 <p className="text-[11px] text-white/40">{roleLabel}</p>
               </div>
             </div>
+            <form action={logout} className="mt-3">
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:border-red-400/40 hover:bg-red-500/10 hover:text-red-300"
+              >
+                <LogOut className="h-4 w-4" /> Çıkış yap
+              </button>
+            </form>
           </div>
         </div>
       </aside>

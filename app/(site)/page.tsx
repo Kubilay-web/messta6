@@ -1,5 +1,5 @@
 // app/(site)/page.tsx
-// Sözün İzinde ana sayfası — hero, hakkında, son yazılar, videolar, galeri, tur bandı.
+// Avrupa Uyanış Hizmetleri ana sayfası — hero, hakkında, son yazılar, videolar, galeri, tur bandı.
 
 import Link from "next/link";
 import Image from "next/image";
@@ -45,6 +45,10 @@ export default async function HomePage() {
           <Image src={profile.coverUrl} alt="" fill priority className="object-cover opacity-30" sizes="100vw" />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-ceyhun-ink/70 via-ceyhun-ink/85 to-ceyhun-ink" />
+        {/* Canlı ışıltı topları (Holy Ghost fire) */}
+        <div className="pointer-events-none absolute -left-24 top-8 h-80 w-80 rounded-full bg-ceyhun-gold/30 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-1/3 h-80 w-80 rounded-full bg-ceyhun-wine/25 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-ceyhun-olive/20 blur-3xl" />
         <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
           <div className="max-w-2xl">
             {profile.avatarUrl && (
@@ -52,14 +56,14 @@ export default async function HomePage() {
                 <Image src={profile.avatarUrl} alt={profile.name} width={96} height={96} className="h-full w-full object-cover" />
               </div>
             )}
-            <span className="inline-block rounded-full border border-ceyhun-gold/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-ceyhun-gold">
+            <span className="inline-block max-w-full break-words rounded-full border border-ceyhun-gold/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-ceyhun-gold sm:text-xs sm:tracking-[0.2em]">
               {t.brandTag}
             </span>
-            <h1 className="mt-5 font-syne text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl">
+            <h1 className="mt-5 break-words font-syne text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
               {profile.name}
             </h1>
-            {title && <p className="mt-3 font-syne text-xl font-semibold text-ceyhun-gold-soft sm:text-2xl">{title}</p>}
-            {tagline && <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">{tagline}</p>}
+            {title && <p className="mt-3 break-words font-syne text-lg font-semibold text-ceyhun-gold-soft sm:text-2xl">{title}</p>}
+            {tagline && <p className="mt-4 max-w-xl text-sm text-white/70 sm:text-lg">{tagline}</p>}
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/tours" className="inline-flex items-center gap-2 rounded-full bg-ceyhun-gold px-6 py-3 text-sm font-semibold text-ceyhun-ink transition-colors hover:bg-white">
@@ -120,8 +124,10 @@ export default async function HomePage() {
       )}
 
       {/* ─────────── Tur bandı ─────────── */}
-      <section className="bg-ceyhun-ink text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+      <section className="relative overflow-hidden bg-ceyhun-ink text-white">
+        <div className="pointer-events-none absolute -right-24 -top-10 h-72 w-72 rounded-full bg-ceyhun-gold/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 left-10 h-64 w-64 rounded-full bg-ceyhun-olive/20 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
             <div>
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-ceyhun-gold">Biblical Turizm</span>

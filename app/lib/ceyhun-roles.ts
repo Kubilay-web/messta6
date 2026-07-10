@@ -36,6 +36,7 @@ const CAP_ROLES: Record<Capability, CeyhunRole[]> = {
 // Admin yolları → gerekli yetenek (sidebar & sayfa guard'ları için).
 export const SECTION_CAP: Record<string, Capability> = {
   "/admin/profile": "content",
+  "/admin/about": "content",
   "/admin/articles": "content",
   "/admin/gallery": "content",
   "/admin/videos": "content",

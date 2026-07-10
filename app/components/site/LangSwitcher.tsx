@@ -13,9 +13,11 @@ import { useLocaleSwitch } from "@/app/lib/useLocaleSwitch";
 export default function LangSwitcher({
   variant = "light",
   className = "",
+  align = "right",
 }: {
   variant?: "light" | "dark";
   className?: string;
+  align?: "left" | "right";
 }) {
   const lang = useClientLocale();
   const switchLocale = useLocaleSwitch();
@@ -51,7 +53,7 @@ export default function LangSwitcher({
       </button>
       {open && (
         <div
-          className={`absolute right-0 z-[80] mt-2 w-40 overflow-hidden rounded-xl border py-1 shadow-xl ${
+          className={`absolute ${align === "left" ? "left-0" : "right-0"} z-[80] mt-2 w-40 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border py-1 shadow-xl ${
             dark ? "border-white/10 bg-ink text-paper" : "border-ink/10 bg-white text-ink"
           }`}
         >

@@ -128,7 +128,7 @@
 
 /* ─────────── Ceyhun makale tipografisi (Prose) ─────────── */
 .ceyhun-prose {
-  color: #26303f;
+  color: #2e2748;
   font-size: 1.0625rem;
   line-height: 1.85;
 }
@@ -139,29 +139,40 @@
   font-size: 1.6rem;
   line-height: 1.25;
   margin-top: 1.8em;
-  color: #0e1524;
+  color: #1c1046;
 }
 .ceyhun-prose h3 {
   font-family: var(--font-syne), sans-serif;
   font-weight: 700;
   font-size: 1.3rem;
   margin-top: 1.5em;
-  color: #0e1524;
+  color: #1c1046;
 }
 .ceyhun-prose p { margin-top: 1.15em; }
-.ceyhun-prose a { color: #a67f38; text-decoration: underline; text-underline-offset: 3px; }
-.ceyhun-prose a:hover { color: #c8a25a; }
-.ceyhun-prose strong { color: #0e1524; font-weight: 700; }
+.ceyhun-prose a { color: #f4511e; text-decoration: underline; text-underline-offset: 3px; }
+.ceyhun-prose a:hover { color: #ffa51f; }
+.ceyhun-prose strong { color: #1c1046; font-weight: 700; }
 .ceyhun-prose ul, .ceyhun-prose ol { margin-top: 1.15em; padding-left: 1.4em; }
 .ceyhun-prose ul { list-style: disc; }
 .ceyhun-prose ol { list-style: decimal; }
 .ceyhun-prose li { margin-top: 0.4em; }
 .ceyhun-prose blockquote {
-  border-left: 3px solid #c8a25a;
+  border-left: 3px solid #ffa51f;
   padding: 0.2em 0 0.2em 1.2em;
   margin: 1.5em 0;
   font-style: italic;
   color: #4a5568;
   font-family: var(--font-syne), sans-serif;
 }
-.ceyhun-prose img { border-radius: 0.75rem; margin: 1.5em 0; }
+.ceyhun-prose img { max-width: 100%; height: auto; border-radius: 0.75rem; margin: 1.5em 0; }
+
+// ————————————————————————————————————————————————————————————
+// Mobil taşma güvenliği — hiçbir bölüm yatay kaydırma/taşma yapmasın.
+// overflow-x: clip → scroll-container OLUŞTURMAZ, sticky header'ı bozmaz.
+// ————————————————————————————————————————————————————————————
+html, body { overflow-x: clip; max-width: 100%; }
+// Uzun başlıklar (Syne display font) dar ekranda kenardan taşmasın.
+.ceyhun-prose h1, .ceyhun-prose h2, .ceyhun-prose h3,
+h1.font-syne, h2.font-syne, h3.font-syne { overflow-wrap: break-word; }
+// Medya varsayılan olarak kapsayıcıyı aşmasın.
+img, video, iframe { max-width: 100%; }

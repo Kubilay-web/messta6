@@ -3,13 +3,14 @@
 // app/admin/articles/ArticleManager.tsx
 // Yazı/makale yönetimi: liste + oluştur/düzenle modalı. Çok dilli başlık/özet + zengin gövde.
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Plus, Pencil, Trash2, X, Save, EyeOff, Star } from "lucide-react";
 import Image from "next/image";
 import { saveArticle, deleteArticle, type AdminResult } from "../ceyhun-actions";
 import MultiLangField from "../_components/MultiLangField";
 import RichTextField from "../_components/RichTextField";
 import ImageUpload from "../_components/ImageUpload";
+import AiAssist, { type AiPatch } from "./AiAssist";
 
 type Lang = { tr: string; en: string; de: string };
 export type ArticleDTO = {
@@ -50,10 +51,28 @@ export default function ArticleManager({ items }: { items: ArticleDTO[] }) {
   const [editing, setEditing] = useState<ArticleDTO | null>(null);
   const [state, formAction, pending] = useActionState(saveArticle, initial);
   const [delPending, startDel] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
+  // AI içeriği uygulandığında alanları yeniden mount etmek için sayaç (uncontrolled alanlar reseed olsun).
+  const [remount, setRemount] = useState(0);
 
   useEffect(() => {
     if (state.ok) setEditing(null);
   }, [state]);
+
+  // AI'ın ürettiği/çevirdiği içeriği editing state'ine işle + alanları remount et.
+  const applyAi = (patch: AiPatch) => {
+    setEditing((prev) =>
+      prev
+        ? {
+            ...prev,
+            title: { ...prev.title, ...patch.title },
+            excerpt: { ...prev.excerpt, ...patch.excerpt },
+            body: { ...prev.body, ...patch.body },
+          }
+        : prev
+    );
+    setRemount((x) => x + 1);
+  };
 
   return (
     <div>
@@ -108,7 +127,7 @@ export default function ArticleManager({ items }: { items: ArticleDTO[] }) {
 
       {editing && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
-          <form action={formAction} className="my-8 w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
+          <form ref={formRef} action={formAction} className="my-8 w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-5 flex items-center justify-between">
               <h3 className="font-syne text-xl font-bold">{editing.id ? "Yazıyı düzenle" : "Yeni yazı"}</h3>
               <button type="button" onClick={() => setEditing(null)} className="text-ink/40 hover:text-ink">
@@ -136,9 +155,11 @@ export default function ArticleManager({ items }: { items: ArticleDTO[] }) {
               </label>
             </div>
 
-            <MultiLangField base="title" label="Başlık" value={editing.title} required />
-            <MultiLangField base="excerpt" label="Özet" value={editing.excerpt} textarea rows={2} />
-            <RichTextField base="body" label="Gövde" value={editing.body} />
+            <AiAssist formRef={formRef} onApply={applyAi} />
+
+            <MultiLangField key={`title-${editing.id}-${remount}`} base="title" label="Başlık" value={editing.title} required />
+            <MultiLangField key={`excerpt-${editing.id}-${remount}`} base="excerpt" label="Özet" value={editing.excerpt} textarea rows={2} />
+            <RichTextField key={`body-${editing.id}-${remount}`} base="body" label="Gövde" value={editing.body} />
 
             <div className="mt-4">
               <ImageUpload name="coverUrl" defaultValue={editing.coverUrl ?? ""} label="Kapak görseli" folder="articles" />

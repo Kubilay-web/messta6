@@ -10,7 +10,7 @@ import { useClientLocale } from "@/app/lib/useLocale";
 import LangSwitcher from "@/app/components/site/LangSwitcher";
 import { CONCEPT, type ConceptLocale } from "../register/concept";
 
-export default function LoginForm({ redirect = "/", brand = "Sözün İzinde" }: { redirect?: string; brand?: string }) {
+export default function LoginForm({ redirect = "/", brand = "Avrupa Uyanış Hizmetleri" }: { redirect?: string; brand?: string }) {
   const router = useRouter();
   const { copy } = useInvenimusCopy();
   const a = copy.auth;
@@ -44,7 +44,7 @@ export default function LoginForm({ redirect = "/", brand = "Sözün İzinde" }:
 
   return (
     <div className="flex min-h-screen flex-col bg-ceyhun-cream font-sans text-ceyhun-ink lg:flex-row">
-      {/* Sol: marka paneli — Sözün İzinde konsepti */}
+      {/* Sol: marka paneli — Avrupa Uyanış Hizmetleri konsepti */}
       <div className="relative hidden overflow-hidden bg-ceyhun-night text-ceyhun-cream lg:flex lg:w-1/2">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -left-24 top-10 h-[28rem] w-[28rem] rounded-full bg-ceyhun-gold/20 blur-[120px]" />

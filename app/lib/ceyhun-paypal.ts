@@ -47,7 +47,7 @@ export async function createPaypalOrder(opts: {
       },
     ],
     application_context: {
-      brand_name: (opts.brandName || "Sözün İzinde").slice(0, 127),
+      brand_name: (opts.brandName || "Avrupa Uyanış Hizmetleri").slice(0, 127),
       shipping_preference: "NO_SHIPPING",
       user_action: "PAY_NOW",
       return_url: opts.returnUrl,

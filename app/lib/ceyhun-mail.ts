@@ -11,8 +11,8 @@ const apiKey = process.env.RESEND_API_KEY;
 const resend = apiKey ? new Resend(apiKey) : null;
 
 // Doğrulanmış domain yoksa Resend sandbox adresi (yalnız hesap sahibine gider).
-const FROM = process.env.CEYHUN_MAIL_FROM || "Sözün İzinde <onboarding@resend.dev>";
-const BRAND = process.env.CEYHUN_BRAND_NAME || "Sözün İzinde";
+const FROM = process.env.CEYHUN_MAIL_FROM || "Avrupa Uyanış Hizmetleri <onboarding@resend.dev>";
+const BRAND = process.env.CEYHUN_BRAND_NAME || "Avrupa Uyanış Hizmetleri";
 
 export function isMailConfigured() {
   return Boolean(resend);

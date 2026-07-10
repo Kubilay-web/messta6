@@ -1,5 +1,5 @@
 // app/register/concept.ts
-// Giriş/kayıt marka panelleri için "Sözün İzinde" konsept metinleri (çok dilli).
+// Giriş/kayıt marka panelleri için "Avrupa Uyanış Hizmetleri" konsept metinleri (çok dilli).
 // Fonksiyonel form etiketleri useInvenimusCopy'den gelir; burada yalnızca konsept anlatısı.
 
 export type ConceptLocale = "tr" | "en" | "de";
@@ -12,7 +12,7 @@ export const CONCEPT: Record<ConceptLocale, ConceptEntry> = {
   tr: {
     login: {
       eyebrow: "TEKRAR HOŞ GELDİNİZ",
-      brandTitle: "Sözün izinde, birlikte yürüyelim.",
+      brandTitle: "Avrupa'da uyanışa, birlikte yürüyelim.",
       brandDesc:
         "Vaazlar, eğitimler, dua buluşmaları ve kutsal topraklara yolculuk — hepsi tek bir çatı altında.",
       perks: [

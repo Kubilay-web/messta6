@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       // @ts-expect-error özel alanlar Stream tarafından serbestçe kabul edilir
       name: `Dua: ${meeting.slug}`,
     });
-    await streamServerClient.upsertUser({ id: "ceyhun-host", name: "Sözün İzinde" });
+    await streamServerClient.upsertUser({ id: "ceyhun-host", name: "Avrupa Uyanış Hizmetleri" });
     await channel.create().catch(() => {}); // zaten varsa yut
 
     const token = streamServerClient.createToken(userId);

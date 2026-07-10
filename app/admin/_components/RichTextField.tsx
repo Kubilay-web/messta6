@@ -24,14 +24,58 @@ const LANGS = [
 
 type LangVal = { tr?: string; en?: string; de?: string };
 
+// Toolbar "resim" düğmesi: dosya seç → /api/admin/upload (Cloudinary) → düzenleyiciye göm.
+// Quill, handler'ı toolbar modülü bağlamıyla (this.quill) çağırır.
+type QuillLike = {
+  getSelection: (focus?: boolean) => { index: number; length: number };
+  setSelection: (index: number, length?: number) => void;
+  insertText: (index: number, text: string, format?: string, value?: unknown) => void;
+  deleteText: (index: number, length: number) => void;
+  insertEmbed: (index: number, type: string, value: string, source?: string) => void;
+};
+function imageHandler(this: { quill: QuillLike }) {
+  const quill = this.quill;
+  const input = document.createElement("input");
+  input.setAttribute("type", "file");
+  input.setAttribute("accept", "image/*");
+  input.click();
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    const range = quill.getSelection(true);
+    // Yükleme sırasında yer tutucu metin.
+    quill.insertText(range.index, "  yükleniyor…", "italic", true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "articles");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      quill.deleteText(range.index, "  yükleniyor…".length);
+      if (res.ok && data?.url) {
+        quill.insertEmbed(range.index, "image", data.url, "user");
+        quill.setSelection(range.index + 1, 0);
+      } else {
+        quill.insertText(range.index, `  [görsel yüklenemedi: ${data?.error ?? "hata"}]`, "user");
+      }
+    } catch {
+      quill.deleteText(range.index, "  yükleniyor…".length);
+      quill.insertText(range.index, "  [görsel yüklenemedi]", "user");
+    }
+  };
+}
+
 const MODULES = {
-  toolbar: [
-    [{ header: [2, 3, false] }],
-    ["bold", "italic", "underline", "blockquote"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    ["clean"],
-  ],
+  toolbar: {
+    container: [
+      [{ header: [2, 3, false] }],
+      ["bold", "italic", "underline", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image"],
+      ["clean"],
+    ],
+    handlers: { image: imageHandler },
+  },
 };
 
 export default function RichTextField({

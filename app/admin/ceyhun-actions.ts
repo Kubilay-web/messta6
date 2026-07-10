@@ -101,7 +101,7 @@ export async function saveProfile(_prev: AdminResult, fd: FormData): Promise<Adm
   });
 
   const data = {
-    name: String(fd.get("name") ?? "").trim() || "Sözün İzinde",
+    name: String(fd.get("name") ?? "").trim() || "Avrupa Uyanış Hizmetleri",
     title: packLangFromForm(fd, "title"),
     tagline: packLangFromForm(fd, "tagline"),
     bio: packLangFromForm(fd, "bio"),
@@ -124,6 +124,20 @@ export async function saveProfile(_prev: AdminResult, fd: FormData): Promise<Adm
   await purgeIfReplaced(existing?.avatarUrl, data.avatarUrl);
   await purgeIfReplaced(existing?.coverUrl, data.coverUrl);
   revalidateAll("/admin/profile");
+  return { ok: true };
+}
+
+// Hakkımızda sayfası (çok dilli zengin HTML, resim gömülebilir).
+export async function saveAbout(_prev: AdminResult, fd: FormData): Promise<AdminResult> {
+  await requireEditor();
+  const about = packLangFromForm(fd, "about");
+  await prisma.ceyhunProfile.upsert({
+    where: { key: "main" },
+    create: { key: "main", about },
+    update: { about },
+  });
+  revalidateAll("/admin/about");
+  revalidatePath("/about");
   return { ok: true };
 }
 
@@ -332,6 +346,14 @@ export async function deletePhoto(id: string): Promise<AdminResult> {
   return { ok: true };
 }
 
+// Mevcut bir fotoğrafı bir albüme taşır (veya albumId=null → albümsüz yapar).
+export async function setPhotoAlbum(photoId: string, albumId: string | null): Promise<AdminResult> {
+  await requireEditor();
+  await prisma.ceyhunPhoto.update({ where: { id: photoId }, data: { albumId: albumId || null } });
+  revalidateAll("/gallery");
+  return { ok: true };
+}
+
 // ─────────────────────────── TUR BAŞVURULARI ───────────────────────────
 
 const TOUR_STATUSES = ["NEW", "REVIEWING", "QUOTED", "CONFIRMED", "REJECTED", "ARCHIVED"];
@@ -416,14 +438,19 @@ export async function saveLesson(_prev: AdminResult, fd: FormData): Promise<Admi
   if (!courseId) return { ok: false, message: "Kurs gerekli." };
   const title = packLangFromForm(fd, "title");
   if (!unpackLang(title).tr && !unpackLang(title).en) return { ok: false, message: "Ders başlığı zorunlu." };
+  const provider = ["mux", "youtube", "vimeo"].includes(String(fd.get("provider") ?? ""))
+    ? String(fd.get("provider"))
+    : "mux";
   const videoRef = String(fd.get("videoRef") ?? "").trim();
-  if (!videoRef) return { ok: false, message: "Önce videoyu Mux'a yükleyin." };
+  if (!videoRef) {
+    return { ok: false, message: provider === "mux" ? "Önce videoyu Mux'a yükleyin." : "Video linki gerekli." };
+  }
 
   const data = {
     courseId,
     title,
     description: packLangFromForm(fd, "description"),
-    provider: "mux",
+    provider,
     videoRef,
     durationSec: num(fd.get("durationSec")),
     isFreePreview: fd.get("isFreePreview") === "on",

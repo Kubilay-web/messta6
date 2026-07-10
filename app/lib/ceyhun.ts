@@ -1,5 +1,5 @@
 // app/lib/ceyhun.ts
-// Sözün İzinde platformu için paylaşılan yardımcılar (sunucu + istemci güvenli).
+// Avrupa Uyanış Hizmetleri platformu için paylaşılan yardımcılar (sunucu + istemci güvenli).
 // Çok dilli alanlar {"tr","en","de"} JSON string olarak saklanır (proje geneli desen).
 
 import { clsx, type ClassValue } from "clsx";

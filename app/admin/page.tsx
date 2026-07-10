@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <PageHeader title="Panel" subtitle="Sözün İzinde platformu — yönetim özeti" />
+      <PageHeader title="Panel" subtitle="Avrupa Uyanış Hizmetleri platformu — yönetim özeti" />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         {stats.map((s) => (

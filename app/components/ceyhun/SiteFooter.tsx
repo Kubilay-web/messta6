@@ -26,12 +26,14 @@ export default function SiteFooter({
   const year = 2026; // sunucu yeniden derlemesinde güncellenir; sabit tutuldu
 
   const cols = [
+    { title: t.nav.about, href: "/about" },
     { title: t.nav.articles, href: "/articles" },
     { title: t.nav.gallery, href: "/gallery" },
     { title: t.nav.videos, href: "/videos" },
     { title: t.nav.tours, href: "/tours" },
     { title: t.nav.courses, href: "/courses" },
     { title: t.nav.prayer, href: "/prayer" },
+    { title: t.nav.assistant, href: "/asistan" },
   ];
 
   return (
@@ -39,7 +41,7 @@ export default function SiteFooter({
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ceyhun-gold font-syne text-sm font-extrabold text-ceyhun-ink">CA</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ceyhun-gold font-syne text-sm font-extrabold text-ceyhun-ink">AU</span>
             <span className="font-syne text-lg font-extrabold text-white">{name}</span>
           </div>
           <p className="mt-3 max-w-xs text-sm text-white/60">{t.brandTag}</p>

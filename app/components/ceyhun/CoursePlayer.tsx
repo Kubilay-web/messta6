@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { PlayCircle, CheckCircle2, Clock } from "lucide-react";
-import { pick, parseMuxRef, type Locale } from "@/app/lib/ceyhun";
+import { pick, parseMuxRef, videoEmbedUrl, isDirectVideo, type Locale } from "@/app/lib/ceyhun";
 import { useCeyhunT } from "@/app/lib/useCeyhunT";
 import DonateWidget from "./DonateWidget";
 import MuxVideo from "./MuxVideo";
@@ -57,7 +57,20 @@ export default function CoursePlayer({
         {/* Oynatıcı */}
         <div className="relative aspect-video overflow-hidden rounded-2xl bg-black shadow-lg">
           {current ? (
-            <MuxVideo key={current.id} playbackId={parseMuxRef(current.videoRef).playbackId} title={pick(current.title, locale)} />
+            current.provider === "mux" ? (
+              <MuxVideo key={current.id} playbackId={parseMuxRef(current.videoRef).playbackId} title={pick(current.title, locale)} />
+            ) : isDirectVideo(current.provider) ? (
+              <video key={current.id} src={current.videoRef} controls playsInline className="h-full w-full bg-black" />
+            ) : (
+              <iframe
+                key={current.id}
+                src={videoEmbedUrl(current.provider, current.videoRef)}
+                title={pick(current.title, locale)}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )
           ) : (
             <div className="flex h-full items-center justify-center text-white/40"><PlayCircle className="h-12 w-12" /></div>
           )}

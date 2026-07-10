@@ -39,28 +39,28 @@ const ECOM: Record<Locale, Brand> = {
   },
 };
 
-// Sözün İzinde markası — vaaz / biblical turizm platformu (varsayılan site markası).
+// Avrupa Uyanış Hizmetleri markası — vaaz / biblical turizm platformu (varsayılan site markası).
 const CEYHUN: Record<Locale, Brand> = {
   tr: {
-    name: "Sözün İzinde",
-    title: "Sözün İzinde — Kilise Vaizi & Biblical Tur Rehberi",
+    name: "Avrupa Uyanış Hizmetleri",
+    title: "Avrupa Uyanış Hizmetleri — Vaaz, Biblical Tur & Online Dua",
     description:
-      "Kutsal Kitap'ın izinde Türkiye. Vaazlar, yazılar ve videolar; İstanbul, 7 Kilise ve Kapadokya için biblical tur başvurusu; online eğitim ve dua toplantıları.",
-    keywords: ["kilise vaizi", "biblical turizm", "7 kilise turu", "İstanbul turu", "Kapadokya turu", "hristiyan vaaz", "online dua"],
+      "Avrupa Uyanış Hizmetleri: Kutsal Kitap'ın izinde vaazlar, yazılar ve videolar; İstanbul, 7 Kilise ve Kapadokya için biblical tur başvurusu; online eğitim, dua toplantıları ve yapay zekâ destekli iman asistanı.",
+    keywords: ["Avrupa Uyanış Hizmetleri", "kilise vaizi", "biblical turizm", "7 kilise turu", "İstanbul turu", "Kapadokya turu", "hristiyan vaaz", "online dua"],
   },
   en: {
-    name: "In the Word's Footsteps",
-    title: "In the Word's Footsteps — Church Preacher & Biblical Tour Guide",
+    name: "Avrupa Uyanış Hizmetleri",
+    title: "Avrupa Uyanış Hizmetleri — European Awakening Services",
     description:
-      "Turkey in the footsteps of the Scriptures. Sermons, writings and videos; apply for Istanbul, Seven Churches and Cappadocia biblical tours; online courses and prayer meetings.",
-    keywords: ["church preacher", "biblical tourism", "seven churches tour", "Istanbul tour", "Cappadocia tour", "christian sermons", "online prayer"],
+      "Avrupa Uyanış Hizmetleri (European Awakening Services): sermons, writings and videos in the footsteps of the Scriptures; apply for Istanbul, Seven Churches and Cappadocia biblical tours; online courses, prayer meetings and an AI faith assistant.",
+    keywords: ["Avrupa Uyanış Hizmetleri", "European Awakening Services", "church preacher", "biblical tourism", "seven churches tour", "Istanbul tour", "Cappadocia tour", "online prayer"],
   },
   de: {
-    name: "Auf den Spuren des Wortes",
-    title: "Auf den Spuren des Wortes — Kirchenprediger & Biblischer Reiseführer",
+    name: "Avrupa Uyanış Hizmetleri",
+    title: "Avrupa Uyanış Hizmetleri — Europäische Erweckungsdienste",
     description:
-      "Die Türkei auf den Spuren der Schrift. Predigten, Schriften und Videos; Bewerbung für Istanbul-, Sieben-Kirchen- und Kappadokien-Touren; Online-Kurse und Gebetstreffen.",
-    keywords: ["Kirchenprediger", "biblischer Tourismus", "Sieben-Kirchen-Tour", "Istanbul-Tour", "Kappadokien-Tour", "christliche Predigten", "Online-Gebet"],
+      "Avrupa Uyanış Hizmetleri (Europäische Erweckungsdienste): Predigten, Schriften und Videos auf den Spuren der Schrift; Bewerbung für Istanbul-, Sieben-Kirchen- und Kappadokien-Touren; Online-Kurse, Gebetstreffen und ein KI-Glaubensassistent.",
+    keywords: ["Avrupa Uyanış Hizmetleri", "Europäische Erweckungsdienste", "Kirchenprediger", "biblischer Tourismus", "Sieben-Kirchen-Tour", "Istanbul-Tour", "Kappadokien-Tour", "Online-Gebet"],
   },
 };
 

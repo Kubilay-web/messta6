@@ -4,7 +4,7 @@
 // Eğitim yönetimi: kurslar (oluştur/düzenle/sil) + her kursun dersleri (oluştur/düzenle/sil).
 
 import { useActionState, useEffect, useState, useTransition } from "react";
-import { Plus, Pencil, Trash2, X, Save, EyeOff, ChevronDown, PlayCircle, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, EyeOff, ChevronDown, PlayCircle, GripVertical, Upload, Link2 } from "lucide-react";
 import { saveCourse, deleteCourse, saveLesson, deleteLesson, type AdminResult } from "../ceyhun-actions";
 import MultiLangField from "../_components/MultiLangField";
 import RichTextField from "../_components/RichTextField";
@@ -128,10 +128,22 @@ function LessonPanel({ course }: { course: CourseDTO }) {
 // ─── Ders ekle/düzenle (kontrollü: Mux yükleme için kaynak+videoRef+süre state'te) ───
 function LessonForm({ editing, courseId, onClose }: { editing: LessonDTO; courseId: string; onClose: () => void }) {
   const [state, formAction, pending] = useActionState(saveLesson, initial);
+  const isLink = editing.provider === "youtube" || editing.provider === "vimeo";
+  const [mode, setMode] = useState<"mux" | "link">(isLink ? "link" : "mux");
   const [videoRef, setVideoRef] = useState(editing.videoRef || "");
+  const [linkProvider, setLinkProvider] = useState<"youtube" | "vimeo">(editing.provider === "vimeo" ? "vimeo" : "youtube");
   const [durationSec, setDurationSec] = useState(editing.durationSec || 0);
   useEffect(() => { if (state.ok) onClose(); }, [state, onClose]);
   const inp = "w-full rounded-lg border border-black/10 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold";
+
+  // Kaynak değişince mux/link için videoRef anlamı değiştiğinden karışmasın diye temizle.
+  const switchMode = (m: "mux" | "link") => { if (m !== mode) { setMode(m); setVideoRef(""); setDurationSec(0); } };
+  const onUrl = (v: string) => {
+    setVideoRef(v);
+    setLinkProvider(/vimeo\.com|player\.vimeo/i.test(v) ? "vimeo" : "youtube");
+  };
+  const tab = (active: boolean) =>
+    `inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${active ? "bg-ceyhun-ink text-white" : "bg-gray-100 text-ink/50 hover:bg-gray-200"}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
@@ -142,26 +154,38 @@ function LessonForm({ editing, courseId, onClose }: { editing: LessonDTO; course
         </div>
         <input type="hidden" name="courseId" value={courseId} />
         {editing.id && <input type="hidden" name="id" value={editing.id} />}
-        {/* Kontrollü alanlar → action'a taşınır (yalnızca Mux) */}
-        <input type="hidden" name="provider" value="mux" readOnly />
+        {/* Kontrollü alanlar → action'a taşınır */}
+        <input type="hidden" name="provider" value={mode === "mux" ? "mux" : linkProvider} readOnly />
         <input type="hidden" name="videoRef" value={videoRef} readOnly />
         <input type="hidden" name="durationSec" value={String(durationSec)} readOnly />
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Kaynak</span>
-            <div className="flex items-center gap-2 rounded-lg border border-black/10 bg-ceyhun-cream-deep/40 px-3 py-2 text-sm">
-              <span className="rounded-full bg-ceyhun-ink px-2 py-0.5 text-[10px] font-semibold uppercase text-white">Mux</span>
-              <span className="text-ink/60">Yükle · adaptif</span>
-            </div></div>
-          <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Sıra</span><input name="order" type="number" defaultValue={String(editing.order)} className={inp} /></label>
+        {/* Kaynak seçici */}
+        <div className="mb-1 block text-xs font-medium text-ink/50">Video kaynağı</div>
+        <div className="flex gap-2">
+          <button type="button" onClick={() => switchMode("mux")} className={tab(mode === "mux")}><Upload className="h-3.5 w-3.5" /> Mux&apos;a yükle</button>
+          <button type="button" onClick={() => switchMode("link")} className={tab(mode === "link")}><Link2 className="h-3.5 w-3.5" /> YouTube / Vimeo linki</button>
         </div>
 
-        {/* Video dosyası doğrudan Mux'a yüklenir */}
-        <div className="mt-4">
-          <MuxVideoUpload value={videoRef}
-            onUploaded={({ videoRef: ref, durationSec: d }) => { setVideoRef(ref); if (d) setDurationSec(d); }}
-            onClear={() => setVideoRef("")} />
-        </div>
+        <label className="mt-4 block"><span className="mb-1 block text-xs font-medium text-ink/50">Sıra</span><input name="order" type="number" defaultValue={String(editing.order)} className={inp} /></label>
+
+        {mode === "mux" ? (
+          <div className="mt-4">
+            <MuxVideoUpload value={videoRef}
+              onUploaded={({ videoRef: ref, durationSec: d }) => { setVideoRef(ref); if (d) setDurationSec(d); }}
+              onClear={() => setVideoRef("")} />
+          </div>
+        ) : (
+          <div className="mt-4">
+            <label className="block"><span className="mb-1 block text-xs font-medium text-ink/50">Video linki (YouTube veya Vimeo)</span>
+              <input value={videoRef} onChange={(e) => onUrl(e.target.value)} placeholder="https://youtube.com/watch?v=… veya https://vimeo.com/…" className={inp} /></label>
+            {videoRef && (
+              <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-ink/50">
+                <span className="rounded-full bg-ceyhun-ink px-2 py-0.5 text-[10px] font-semibold uppercase text-white">{linkProvider}</span>
+                Yayınlanınca oynatıcıda gömülü çalınır.
+              </p>
+            )}
+          </div>
+        )}
 
         <MultiLangField base="title" label="Ders başlığı" value={editing.title} required />
         <MultiLangField base="description" label="Açıklama" value={editing.description} textarea rows={2} />
