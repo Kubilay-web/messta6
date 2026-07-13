@@ -33,3 +33,4 @@ export default async function Register({
   const profile = await getCeyhunProfile();
   return <RegisterForm redirect={target} brand={profile.name} />;
 }
+

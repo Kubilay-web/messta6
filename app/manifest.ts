@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { SITE_NAME } from "@/app/lib/seo";
+import { BRAND_NAME } from "@/app/lib/seo";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: SITE_NAME,
-    short_name: SITE_NAME,
+    name: BRAND_NAME,
+    short_name: BRAND_NAME,
     description:
       "Avrupa Uyanış Hizmetleri — vaaz, Biblical turlar, online dua ve eğitimler.",
     start_url: "/tr",

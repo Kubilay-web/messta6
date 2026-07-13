@@ -4,39 +4,15 @@
 
 import { LOCALES, type Locale } from "./i18n-routing";
 
-export const SITE_NAME = "E-Commerce";
-export const TWITTER_HANDLE = "@ecommerce";
+// Varsayılan site markası (locale-bağımsız). Manifest, OG görseli vb. buradan besler.
+export const BRAND_NAME = "Avrupa Uyanış Hizmetleri";
+export const BRAND_TAGLINE_TR = "Vaaz, Biblical turlar, online dua ve eğitimler.";
 
 export type Brand = {
   name: string;
   title: string;
   description: string;
   keywords: string[];
-};
-
-// Varsayılan e-ticaret markası — locale bazlı.
-const ECOM: Record<Locale, Brand> = {
-  tr: {
-    name: SITE_NAME,
-    title: "invenimus",
-    description:
-      "Özenle seçilmiş ürünleri keşfedin. Hızlı kargo, 256-bit SSL güvenli ödeme ve 14 gün koşulsuz iade. Türkçe, İngilizce ve Almanca alışveriş deneyimi.",
-    keywords: ["online alışveriş", "e-ticaret", "hızlı kargo", "güvenli ödeme", "mağaza"],
-  },
-  en: {
-    name: SITE_NAME,
-    title: "E-Commerce — Curated Products, Fast Shipping",
-    description:
-      "Discover carefully curated products. Fast shipping, 256-bit SSL secure checkout and 14-day free returns. Shop in English, Turkish and German.",
-    keywords: ["online shopping", "ecommerce", "fast shipping", "secure payment", "store"],
-  },
-  de: {
-    name: SITE_NAME,
-    title: "E-Commerce — Sorgfältig ausgewählte Produkte, schneller Versand",
-    description:
-      "Entdecken Sie sorgfältig ausgewählte Produkte. Schneller Versand, sichere 256-Bit-SSL-Zahlung und 14 Tage kostenlose Rückgabe. Einkaufen auf Deutsch, Englisch und Türkisch.",
-    keywords: ["online einkaufen", "e-commerce", "schneller versand", "sichere zahlung", "shop"],
-  },
 };
 
 // Avrupa Uyanış Hizmetleri markası — vaaz / biblical turizm platformu (varsayılan site markası).
@@ -151,7 +127,7 @@ export function organizationLd(base: string, brand: Brand) {
     "@type": "Organization",
     name: brand.name,
     url: base,
-    logo: `${base}/icon.png`,
+    logo: `${base}/favicon.ico`,
     sameAs: [] as string[],
   };
 }
@@ -263,7 +239,7 @@ export function articleLd(opts: {
     publisher: {
       "@type": "Organization",
       name: opts.publisher,
-      logo: { "@type": "ImageObject", url: `${opts.base}/icon.png` },
+      logo: { "@type": "ImageObject", url: `${opts.base}/favicon.ico` },
     },
   };
 }

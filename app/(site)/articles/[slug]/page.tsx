@@ -1,6 +1,7 @@
 // app/(site)/articles/[slug]/page.tsx — Yazı detayı.
 
 import Link from "next/link";
+import { headers } from "next/headers";
 import SmartImage from "@/app/components/ceyhun/SmartImage";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -8,9 +9,11 @@ import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import prisma from "@/app/lib/prisma";
 import { getArticleBySlug } from "@/app/lib/ceyhun-cache";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
-import { localizedHref } from "@/app/lib/i18n-routing";
+import { localizedHref, siteUrl } from "@/app/lib/i18n-routing";
 import { pick, formatDate, safeArray } from "@/app/lib/ceyhun";
 import { Prose } from "@/app/components/ceyhun/ui";
+import JsonLd from "@/app/components/JsonLd";
+import { articleLd, breadcrumbLd, BRAND_NAME } from "@/app/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +44,31 @@ export default async function ArticleDetail({ params }: { params: Promise<{ slug
   const body = pick(a.body, locale);
   const tags = safeArray<string>(a.tags);
 
+  // Yapısal veri: BlogPosting + kırıntı navigasyonu (rich result).
+  const base = siteUrl((await headers()).get("x-hostname"));
+  const url = `${base}${localizedHref(locale, `/articles/${slug}`)}`;
+  const ld = [
+    articleLd({
+      locale,
+      base,
+      url,
+      headline: title,
+      description: pick(a.excerpt, locale) || undefined,
+      image: a.coverUrl || undefined,
+      datePublished: a.publishedAt?.toISOString(),
+      dateModified: (a.updatedAt ?? a.publishedAt)?.toISOString(),
+      publisher: BRAND_NAME,
+    }),
+    breadcrumbLd([
+      { name: t.nav.home, url: `${base}${localizedHref(locale, "/")}` },
+      { name: t.nav.articles, url: `${base}${localizedHref(locale, "/articles")}` },
+      { name: title, url },
+    ]),
+  ];
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+      <JsonLd data={ld} />
       <Link href={localizedHref(locale, "/articles")} className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 transition-colors hover:text-ceyhun-gold-deep">
         <ArrowLeft className="h-4 w-4" /> {t.nav.articles}
       </Link>

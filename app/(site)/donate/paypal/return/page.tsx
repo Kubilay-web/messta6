@@ -10,8 +10,12 @@ import { isPaypalConfigured, capturePaypalOrder } from "@/app/lib/ceyhun-paypal"
 import { getCeyhunT } from "@/app/lib/ceyhunT";
 import { localizedHref } from "@/app/lib/i18n-routing";
 import { formatMoney } from "@/app/lib/ceyhun";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+// İşlemsel dönüş sayfası — arama motorlarında indekslenmemeli.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function PaypalReturnPage({
   searchParams,
