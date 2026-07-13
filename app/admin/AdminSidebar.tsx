@@ -24,6 +24,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { logout } from "@/app/(components)/(authentication-layout)/authentication/actions";
+import { localizedHref, stripLocale, toInternalPath } from "@/app/lib/i18n-routing";
+import { useClientLocale } from "@/app/lib/useLocale";
 
 // Panel (/admin) her role görünür; diğerleri `allowed` (rolün yetenekleri) ile filtrelenir.
 const NAV = [
@@ -52,11 +54,13 @@ export default function AdminSidebar({
   allowed: string[];
 }) {
   const pathname = usePathname();
+  const locale = useClientLocale();
+  const current = toInternalPath(stripLocale(pathname).pathname); // önek + çeviriyi soy
   const [open, setOpen] = useState(false);
   const nav = NAV.filter((item) => item.href === "/admin" || allowed.includes(item.href));
 
   const isActive = (href: string, exact?: boolean) =>
-    exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
+    exact ? current === href : current === href || current.startsWith(href + "/");
 
   return (
     <>
@@ -87,7 +91,7 @@ export default function AdminSidebar({
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={localizedHref(locale, item.href)}
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                     active ? "bg-ceyhun-gold text-ceyhun-ink" : "text-white/70 hover:bg-white/10 hover:text-white"
@@ -101,7 +105,7 @@ export default function AdminSidebar({
           </nav>
 
           <div className="border-t border-white/10 px-4 py-4">
-            <Link href="/" className="mb-3 flex items-center gap-2 text-xs text-white/50 hover:text-white">
+            <Link href={localizedHref(locale, "/")} className="mb-3 flex items-center gap-2 text-xs text-white/50 hover:text-white">
               <ExternalLink className="h-3.5 w-3.5" /> Siteyi görüntüle
             </Link>
             <div className="flex items-center gap-2">

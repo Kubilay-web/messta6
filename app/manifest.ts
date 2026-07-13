@@ -6,8 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     name: SITE_NAME,
     short_name: SITE_NAME,
     description:
-      "Özenle seçilmiş ürünler — hızlı kargo, güvenli ödeme, koşulsuz iade.",
-    start_url: "/",
+      "Avrupa Uyanış Hizmetleri — vaaz, Biblical turlar, online dua ve eğitimler.",
+    start_url: "/tr",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#ffffff",

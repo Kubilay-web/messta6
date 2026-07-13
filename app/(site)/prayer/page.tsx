@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { Radio, Calendar, ArrowRight } from "lucide-react";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
-import { getPublishedMeetings } from "@/app/lib/ceyhun-data";
+import { localizedHref } from "@/app/lib/i18n-routing";
+import { getPublishedMeetings } from "@/app/lib/ceyhun-cache";
 import { pick } from "@/app/lib/ceyhun";
 import { PageHero } from "@/app/components/ceyhun/ui";
 
@@ -13,6 +14,12 @@ const COPY = {
   en: { eyebrow: "Pray Together", title: "Online Prayer Meetings", subtitle: "Join the live stream, share your prayer requests in chat, and pray together.", join: "Join", live: "LIVE", soon: "Upcoming", empty: "No meetings scheduled right now. New dates coming soon." },
   de: { eyebrow: "Gemeinsam beten", title: "Online-Gebetstreffen", subtitle: "Nehmen Sie am Livestream teil, teilen Sie Ihre Anliegen im Chat und beten Sie mit.", join: "Beitreten", live: "LIVE", soon: "Demnächst", empty: "Derzeit keine Treffen geplant. Neue Termine folgen bald." },
 } as const;
+
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const { locale } = await getCeyhunT();
+  const c = COPY[locale] ?? COPY.tr;
+  return { title: c.title, description: c.subtitle };
+}
 
 export default async function PrayerListPage() {
   const { locale } = await getCeyhunT();
@@ -35,7 +42,7 @@ export default async function PrayerListPage() {
           {meetings.map((m) => {
             const live = m.status === "LIVE";
             return (
-              <Link key={m.id} href={`/prayer/${m.slug}`}
+              <Link key={m.id} href={localizedHref(locale, `/prayer/${m.slug}`)}
                 className={`group flex items-center gap-4 rounded-2xl border-2 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${live ? "border-red-300" : "border-ceyhun-ink/10 hover:border-ceyhun-gold/50"}`}>
                 <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 ${live ? "bg-red-600 text-white" : "bg-ceyhun-ink text-ceyhun-gold"}`}>
                   <Radio className="h-6 w-6" />

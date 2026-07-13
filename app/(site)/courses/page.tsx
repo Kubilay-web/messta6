@@ -3,7 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { PlayCircle, Layers, ArrowRight } from "lucide-react";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
-import { getPublishedCourses } from "@/app/lib/ceyhun-data";
+import { localizedHref } from "@/app/lib/i18n-routing";
+import { getPublishedCourses } from "@/app/lib/ceyhun-cache";
 import { pick } from "@/app/lib/ceyhun";
 import { PageHero } from "@/app/components/ceyhun/ui";
 
@@ -14,6 +15,12 @@ const COPY = {
   en: { eyebrow: "Learn", title: "Online Courses", subtitle: "Preaching and teaching courses — all free. Watch, and support with any amount you wish.", free: "Free", lessons: "lessons" },
   de: { eyebrow: "Lernen", title: "Online-Kurse", subtitle: "Predigt- und Lehrkurse — alle kostenlos. Ansehen und mit einem Betrag Ihrer Wahl unterstützen.", free: "Kostenlos", lessons: "Lektionen" },
 } as const;
+
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const { locale } = await getCeyhunT();
+  const c = COPY[locale] ?? COPY.tr;
+  return { title: c.title, description: c.subtitle };
+}
 
 export default async function CoursesPage() {
   const { locale, t } = await getCeyhunT();
@@ -29,7 +36,7 @@ export default async function CoursesPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((course) => (
-            <Link key={course.id} href={`/courses/${course.slug}`}
+            <Link key={course.id} href={localizedHref(locale, `/courses/${course.slug}`)}
               className="group flex flex-col overflow-hidden rounded-2xl border border-ceyhun-ink/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-ceyhun-gold/40 hover:shadow-xl hover:shadow-ceyhun-ink/10">
               <div className="relative aspect-[16/10] overflow-hidden bg-ceyhun-ink">
                 {course.coverUrl ? (

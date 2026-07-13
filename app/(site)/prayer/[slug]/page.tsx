@@ -2,13 +2,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar } from "lucide-react";
-import { getMeetingBySlug } from "@/app/lib/ceyhun-data";
+import { getMeetingBySlug } from "@/app/lib/ceyhun-cache";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
+import { localizedHref } from "@/app/lib/i18n-routing";
 import { pick, safeObject } from "@/app/lib/ceyhun";
 import PrayerRoom from "@/app/components/ceyhun/PrayerRoom";
 import LiveRoom from "@/app/components/ceyhun/live/LiveRoom";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const { t, locale } = await getCeyhunT();
+  const m = await getMeetingBySlug(slug);
+  if (!m) return { title: t.common.notFound };
+  return { title: pick(m.title, locale), description: pick(m.description, locale) };
+}
 
 export default async function PrayerRoomPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -25,7 +35,7 @@ export default async function PrayerRoomPage({ params }: { params: Promise<{ slu
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <Link href="/prayer" className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 hover:text-ceyhun-gold-deep">
+      <Link href={localizedHref(locale, "/prayer")} className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 hover:text-ceyhun-gold-deep">
         <ArrowLeft className="h-4 w-4" /> {t.nav.prayer}
       </Link>
       <div className="mb-6 mt-4">

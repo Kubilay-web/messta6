@@ -8,6 +8,7 @@ import { Check, Heart } from "lucide-react";
 import prisma from "@/app/lib/prisma";
 import { isPaypalConfigured, capturePaypalOrder } from "@/app/lib/ceyhun-paypal";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
+import { localizedHref } from "@/app/lib/i18n-routing";
 import { formatMoney } from "@/app/lib/ceyhun";
 
 export const dynamic = "force-dynamic";
@@ -71,7 +72,7 @@ export default async function PaypalReturnPage({
           {locale === "en" ? "received with gratitude." : locale === "de" ? "mit Dankbarkeit erhalten." : "şükranla alındı."}
         </p>
       )}
-      <Link href="/" className="mt-8 inline-flex rounded-full bg-ceyhun-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ceyhun-gold-deep">
+      <Link href={localizedHref(locale, "/")} className="mt-8 inline-flex rounded-full bg-ceyhun-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ceyhun-gold-deep">
         {t.nav.home}
       </Link>
     </div>

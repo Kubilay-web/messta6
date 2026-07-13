@@ -1,15 +1,18 @@
 "use client";
 
 // app/lib/useLocale.ts
-// Provider gerektirmeyen, hafif istemci dil yardımcısı.
-// Tek paylaşılan çerezi (NEXT_LOCALE) okur ve "localechange" olayını dinleyerek
-// dil değişiminde canlı güncellenir. Sidebar gibi provider dışındaki bileşenler kullanır.
+// İSTEMCI dil kaynağı. Artık geçerli dil URL önekinden gelir ve sunucudan
+// LocaleContext ile aktarılır → SSR ile birebir aynı (hidrasyon flash'ı YOK).
+// Provider dışında kullanılırsa güvenli biçimde çereze/"tr"ye düşer.
 
-import { useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 
 export type ClientLocale = "tr" | "en" | "de";
 export const LOCALE_COOKIE = "NEXT_LOCALE";
 export const LOCALE_EVENT = "localechange";
+
+// Sunucudan (getServerLocale → x-locale) beslenen geçerli dil bağlamı.
+export const LocaleContext = createContext<ClientLocale | null>(null);
 
 export function readLocaleCookie(): ClientLocale {
   if (typeof document === "undefined") return "tr";
@@ -28,14 +31,8 @@ export function setLocaleCookie(l: ClientLocale) {
   window.dispatchEvent(new Event(LOCALE_EVENT));
 }
 
-// Geçerli dili döndüren hook. Hidrasyon uyumu için "tr" ile başlar, mount'ta günceller.
+// Geçerli dili döndüren hook. Öncelik: LocaleContext (SSR-doğru) > çerez > "tr".
 export function useClientLocale(): ClientLocale {
-  const [lang, setLang] = useState<ClientLocale>("tr");
-  useEffect(() => {
-    const sync = () => setLang(readLocaleCookie());
-    sync();
-    window.addEventListener(LOCALE_EVENT, sync);
-    return () => window.removeEventListener(LOCALE_EVENT, sync);
-  }, []);
-  return lang;
+  const ctx = useContext(LocaleContext);
+  return ctx ?? readLocaleCookie();
 }

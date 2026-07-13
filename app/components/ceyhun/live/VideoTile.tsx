@@ -15,6 +15,7 @@ export default function VideoTile({
   muted = false,
   mirror = false,
   camOn = true,
+  unmuteLabel = "Sesi aç",
 }: {
   stream: MediaStream | null;
   name: string;
@@ -22,6 +23,7 @@ export default function VideoTile({
   muted?: boolean;
   mirror?: boolean;
   camOn?: boolean;
+  unmuteLabel?: string;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [needsTap, setNeedsTap] = useState(false);
@@ -91,7 +93,7 @@ export default function VideoTile({
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ceyhun-gold text-ceyhun-ink">
             <Volume2 className="h-6 w-6" />
           </span>
-          <span className="text-sm font-semibold">Sesi aç</span>
+          <span className="text-sm font-semibold">{unmuteLabel}</span>
         </button>
       )}
       <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs font-medium text-white">

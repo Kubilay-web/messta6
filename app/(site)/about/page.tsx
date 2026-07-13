@@ -1,8 +1,9 @@
 // app/(site)/about/page.tsx — Hakkımızda (Avrupa Uyanış Hizmetleri tanıtımı).
 import type { Metadata } from "next";
-import { getCeyhunProfile } from "@/app/lib/ceyhun-data";
+import { getCeyhunProfile } from "@/app/lib/ceyhun-cache";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
 import { pick } from "@/app/lib/ceyhun";
+import SmartImage from "@/app/components/ceyhun/SmartImage";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,7 @@ export default async function AboutPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-ceyhun-ink text-white">
         {p.coverUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={p.coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+          <SmartImage src={p.coverUrl} alt="" fill priority blur={false} sizes="100vw" className="object-cover opacity-25" />
         )}
         <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-24">
           <span className="inline-block rounded-full border border-ceyhun-gold/40 bg-ceyhun-gold/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ceyhun-gold">

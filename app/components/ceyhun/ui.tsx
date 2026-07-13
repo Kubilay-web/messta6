@@ -2,7 +2,7 @@
 // Ceyhun genel sitesi için sunucu-güvenli sunum bileşenleri.
 
 import Link from "next/link";
-import Image from "next/image";
+import SmartImage from "./SmartImage";
 import { ArrowRight, Clock } from "lucide-react";
 
 // Tüm liste/iç sayfalar için ortak, konsepte uygun canlı başlık bandı
@@ -102,7 +102,7 @@ export function ArticleCard({
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-ceyhun-cream-deep">
         {cover ? (
-          <Image src={cover} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />
+          <SmartImage src={cover} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />
         ) : (
           <div className="flex h-full items-center justify-center font-syne text-4xl text-ceyhun-gold/40">✝</div>
         )}

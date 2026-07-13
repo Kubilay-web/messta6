@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
-import { getCourseBySlug } from "@/app/lib/ceyhun-data";
+import { getCourseBySlug } from "@/app/lib/ceyhun-cache";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
+import { localizedHref } from "@/app/lib/i18n-routing";
 import { pick } from "@/app/lib/ceyhun";
 import CoursePlayer from "@/app/components/ceyhun/CoursePlayer";
 
@@ -12,9 +13,10 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const { t, locale } = await getCeyhunT();
   const course = await getCourseBySlug(slug);
-  if (!course) return { title: "Eğitim bulunamadı" };
-  return { title: pick(course.title, "tr"), description: pick(course.description, "tr") };
+  if (!course) return { title: t.common.notFound };
+  return { title: pick(course.title, locale), description: pick(course.description, locale) };
 }
 
 export default async function CourseDetail({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,7 +27,7 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-      <Link href="/courses" className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 hover:text-ceyhun-gold-deep">
+      <Link href={localizedHref(locale, "/courses")} className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 hover:text-ceyhun-gold-deep">
         <ArrowLeft className="h-4 w-4" /> {t.nav.courses}
       </Link>
       <h1 className="mt-5 font-syne text-3xl font-extrabold tracking-tight text-ceyhun-ink sm:text-4xl">{pick(course.title, locale)}</h1>

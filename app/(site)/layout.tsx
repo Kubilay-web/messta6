@@ -2,11 +2,12 @@
 // Genel (herkese açık) Ceyhun sitesi düzeni — üst menü + alt bilgi.
 // Admin ve auth sayfaları bu grubun dışında olduğundan bu chrome onları etkilemez.
 
-import { getCeyhunProfile } from "@/app/lib/ceyhun-data";
+import { getCeyhunProfile } from "@/app/lib/ceyhun-cache";
 import { safeObject } from "@/app/lib/ceyhun";
 import SiteHeader from "@/app/components/ceyhun/SiteHeader";
 import SiteFooter from "@/app/components/ceyhun/SiteFooter";
 import VoiceAssistant from "@/app/components/ceyhun/VoiceAssistant";
+import Defer from "@/app/components/ceyhun/Defer";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const p = await getCeyhunProfile();
@@ -23,7 +24,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         location={p.location}
         socials={socials}
       />
-      <VoiceAssistant />
+      {/* Ağır 3. taraf sesli asistan: ilk kullanıcı etkileşimine kadar ertelenir
+          → LCP/TTI'yi bloklamaz, ana içerik önce boyanır. */}
+      <Defer strategy="interaction">
+        <VoiceAssistant />
+      </Defer>
     </div>
   );
 }

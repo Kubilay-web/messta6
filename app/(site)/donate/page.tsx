@@ -11,6 +11,12 @@ const COPY = {
   de: { title: "Spenden", text: "Unterstützen Sie den Dienst mit einem Betrag Ihrer Wahl. Jede Gabe wird mit Dankbarkeit empfangen.", points: ["Online-Kurse bleiben kostenlos", "Gebetstreffen fortführen", "Mehr Menschen erreichen"] },
 } as const;
 
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const { locale } = await getCeyhunT();
+  const c = COPY[locale] ?? COPY.tr;
+  return { title: c.title, description: c.text };
+}
+
 export default async function DonatePage() {
   const { locale } = await getCeyhunT();
   const c = COPY[locale] ?? COPY.tr;

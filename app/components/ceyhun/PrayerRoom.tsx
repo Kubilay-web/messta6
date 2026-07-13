@@ -16,9 +16,9 @@ import DonateWidget from "./DonateWidget";
 type Msg = { id: string; text: string; user: string; own: boolean };
 
 const COPY: Record<Locale, Record<string, string>> = {
-  tr: { live: "CANLI", offline: "Yayın henüz başlamadı", waiting: "Yayın başladığında burada görünecek.", join: "Sohbete katıl", yourName: "Adınız", enter: "Katıl", chat: "Canlı sohbet", placeholder: "Mesaj yaz…", connecting: "Bağlanıyor…", prayer: "Dua isteği gönder", prayerText: "Dua edilmesini istediğiniz konuyu bize iletin; dualarımızda anılacak.", request: "Dua konunuz", send: "Gönder", thanks: "Dua isteğiniz alındı. 🙏", support: "Bu hizmete destek ol" },
-  en: { live: "LIVE", offline: "Stream hasn't started yet", waiting: "It will appear here when the stream goes live.", join: "Join the chat", yourName: "Your name", enter: "Join", chat: "Live chat", placeholder: "Type a message…", connecting: "Connecting…", prayer: "Send a prayer request", prayerText: "Share what you'd like prayer for; it will be lifted up.", request: "Your prayer request", send: "Send", thanks: "Your prayer request was received. 🙏", support: "Support this ministry" },
-  de: { live: "LIVE", offline: "Stream hat noch nicht begonnen", waiting: "Es erscheint hier, sobald der Stream live geht.", join: "Chat beitreten", yourName: "Ihr Name", enter: "Beitreten", chat: "Live-Chat", placeholder: "Nachricht schreiben…", connecting: "Verbindung…", prayer: "Gebetsanliegen senden", prayerText: "Teilen Sie, wofür gebetet werden soll.", request: "Ihr Gebetsanliegen", send: "Senden", thanks: "Ihr Gebetsanliegen wurde empfangen. 🙏", support: "Diesen Dienst unterstützen" },
+  tr: { live: "CANLI", offline: "Yayın henüz başlamadı", waiting: "Yayın başladığında burada görünecek.", join: "Sohbete katıl", yourName: "Adınız", enter: "Katıl", chat: "Canlı sohbet", placeholder: "Mesaj yaz…", connecting: "Bağlanıyor…", prayer: "Dua isteği gönder", prayerText: "Dua edilmesini istediğiniz konuyu bize iletin; dualarımızda anılacak.", request: "Dua konunuz", send: "Gönder", thanks: "Dua isteğiniz alındı. 🙏", support: "Bu hizmete destek ol", errConnect: "Bağlanılamadı.", errSend: "Mesaj gönderilemedi.", email: "E-posta" },
+  en: { live: "LIVE", offline: "Stream hasn't started yet", waiting: "It will appear here when the stream goes live.", join: "Join the chat", yourName: "Your name", enter: "Join", chat: "Live chat", placeholder: "Type a message…", connecting: "Connecting…", prayer: "Send a prayer request", prayerText: "Share what you'd like prayer for; it will be lifted up.", request: "Your prayer request", send: "Send", thanks: "Your prayer request was received. 🙏", support: "Support this ministry", errConnect: "Could not connect.", errSend: "Message could not be sent.", email: "Email" },
+  de: { live: "LIVE", offline: "Stream hat noch nicht begonnen", waiting: "Es erscheint hier, sobald der Stream live geht.", join: "Chat beitreten", yourName: "Ihr Name", enter: "Beitreten", chat: "Live-Chat", placeholder: "Nachricht schreiben…", connecting: "Verbindung…", prayer: "Gebetsanliegen senden", prayerText: "Teilen Sie, wofür gebetet werden soll.", request: "Ihr Gebetsanliegen", send: "Senden", thanks: "Ihr Gebetsanliegen wurde empfangen. 🙏", support: "Diesen Dienst unterstützen", errConnect: "Verbindung fehlgeschlagen.", errSend: "Nachricht konnte nicht gesendet werden.", email: "E-Mail" },
 };
 
 const prayerInitial: PublicResult = { ok: false };
@@ -70,7 +70,7 @@ export default function PrayerRoom({
         body: JSON.stringify({ meetingId, name }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Bağlanılamadı.");
+      if (!res.ok) throw new Error(data?.error || c.errConnect);
 
       const client = StreamChat.getInstance(data.apiKey);
       if (client.userID && client.userID !== data.userId) await client.disconnectUser();
@@ -97,7 +97,7 @@ export default function PrayerRoom({
 
       setJoined(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Bağlanılamadı.");
+      setError(e instanceof Error ? e.message : c.errConnect);
     } finally {
       setConnecting(false);
     }
@@ -110,7 +110,7 @@ export default function PrayerRoom({
     try {
       await channelRef.current.sendMessage({ text: t });
     } catch {
-      setError("Mesaj gönderilemedi.");
+      setError(c.errSend);
     }
   }
 
@@ -193,7 +193,7 @@ export default function PrayerRoom({
               <input type="hidden" name="meetingId" value={meetingId} />
               <input type="text" name="company" tabIndex={-1} autoComplete="off" className="absolute left-[-9999px]" aria-hidden />
               <input name="name" required placeholder={c.yourName} className="w-full rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
-              <input name="email" type="email" required placeholder="E-posta" className="w-full rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
+              <input name="email" type="email" required placeholder={c.email} className="w-full rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
               <textarea name="prayerRequest" rows={3} placeholder={c.request} className="w-full resize-y rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
               {prayerState.message && !prayerState.ok && <p className="text-xs text-red-600">{prayerState.message}</p>}
               <button type="submit" disabled={prayerPending} className="inline-flex items-center gap-2 rounded-full bg-ceyhun-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-ceyhun-gold-deep disabled:opacity-60">

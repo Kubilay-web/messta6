@@ -28,6 +28,7 @@ import {
 } from "./lib/i18n-routing";
 import { resolveBrand, organizationLd, websiteLd } from "./lib/seo";
 import JsonLd from "./components/JsonLd";
+import LocaleProvider from "./components/ceyhun/LocaleProvider";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
@@ -126,7 +127,9 @@ export default async function RootLayout({
 
       <body>
         <SessionProvider value={session}>
-          <ClientProviders>{children}</ClientProviders>
+          <ClientProviders>
+            <LocaleProvider locale={lang}>{children}</LocaleProvider>
+          </ClientProviders>
         </SessionProvider>
       </body>
     </html>

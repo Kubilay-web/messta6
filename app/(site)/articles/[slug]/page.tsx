@@ -6,8 +6,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import prisma from "@/app/lib/prisma";
-import { getArticleBySlug } from "@/app/lib/ceyhun-data";
+import { getArticleBySlug } from "@/app/lib/ceyhun-cache";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
+import { localizedHref } from "@/app/lib/i18n-routing";
 import { pick, formatDate, safeArray } from "@/app/lib/ceyhun";
 import { Prose } from "@/app/components/ceyhun/ui";
 
@@ -15,10 +16,11 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const { t, locale } = await getCeyhunT();
   const a = await getArticleBySlug(slug);
-  if (!a) return { title: "Yazı bulunamadı" };
-  const title = pick(a.title, "tr");
-  const description = pick(a.excerpt, "tr");
+  if (!a) return { title: t.common.notFound };
+  const title = pick(a.title, locale);
+  const description = pick(a.excerpt, locale);
   return {
     title,
     description,
@@ -41,7 +43,7 @@ export default async function ArticleDetail({ params }: { params: Promise<{ slug
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-      <Link href="/articles" className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 transition-colors hover:text-ceyhun-gold-deep">
+      <Link href={localizedHref(locale, "/articles")} className="inline-flex items-center gap-1.5 text-sm font-medium text-ceyhun-ink/60 transition-colors hover:text-ceyhun-gold-deep">
         <ArrowLeft className="h-4 w-4" /> {t.nav.articles}
       </Link>
 

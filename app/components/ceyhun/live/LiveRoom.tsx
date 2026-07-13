@@ -34,6 +34,7 @@ const COPY: Record<Locale, Record<string, string>> = {
     enterConsole: "Konsola gir", prayer: "Dua isteği gönder", prayerText: "Dua edilmesini istediğiniz konuyu iletin.",
     request: "Dua konunuz", send: "Gönder", thanks: "Dua isteğiniz alındı. 🙏", watching: "izliyor",
     prayerNotes: "Canlı dua notları", camMic: "Kamera/mikrofon", handHint: "Ceyhun Ağabey onaylayınca canlı bağlanırsınız.",
+    errConnect: "Bağlanılamadı.", unmute: "Sesi aç", you: "(siz)", email: "E-posta",
   },
   en: {
     live: "LIVE", offline: "Stream hasn't started yet", waiting: "It will appear here once live.",
@@ -44,6 +45,7 @@ const COPY: Record<Locale, Record<string, string>> = {
     enterConsole: "Enter console", prayer: "Send a prayer request", prayerText: "Share what you'd like prayer for.",
     request: "Your prayer request", send: "Send", thanks: "Your prayer request was received. 🙏", watching: "watching",
     prayerNotes: "Live prayer notes", camMic: "Camera/mic", handHint: "You'll go live once approved.",
+    errConnect: "Could not connect.", unmute: "Unmute", you: "(you)", email: "Email",
   },
   de: {
     live: "LIVE", offline: "Stream hat noch nicht begonnen", waiting: "Erscheint hier, sobald live.",
@@ -54,6 +56,7 @@ const COPY: Record<Locale, Record<string, string>> = {
     enterConsole: "Konsole öffnen", prayer: "Gebetsanliegen senden", prayerText: "Teilen Sie Ihr Anliegen.",
     request: "Ihr Anliegen", send: "Senden", thanks: "Ihr Anliegen wurde empfangen. 🙏", watching: "sehen zu",
     prayerNotes: "Live-Gebetsnotizen", camMic: "Kamera/Mikro", handHint: "Sie gehen nach Freigabe live.",
+    errConnect: "Verbindung fehlgeschlagen.", unmute: "Ton an", you: "(Sie)", email: "E-Mail",
   },
 };
 
@@ -82,12 +85,12 @@ export default function LiveRoom({
           body: JSON.stringify({ meetingId, asHost }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || "Bağlanılamadı.");
+        if (!res.ok) throw new Error(data?.error || c.errConnect);
         if (!alive) return;
         setConfig(data);
         if (data.selfName) setName(data.selfName);
       } catch (e) {
-        if (alive) setLoadErr(e instanceof Error ? e.message : "Bağlanılamadı.");
+        if (alive) setLoadErr(e instanceof Error ? e.message : c.errConnect);
       }
     })();
     return () => {
@@ -195,10 +198,10 @@ function LiveRoomInner({
           ) : (
             <div className={`grid gap-2 ${gridCols}`}>
               {room.publishing && (
-                <VideoTile stream={room.localStream} name={`${name} (siz)`} role={room.selfRole} muted mirror camOn={room.camOn} />
+                <VideoTile stream={room.localStream} name={`${name} ${c.you}`} role={room.selfRole} muted mirror camOn={room.camOn} unmuteLabel={c.unmute} />
               )}
               {publisherPeers.map((p) => (
-                <VideoTile key={p.id} stream={p.stream} name={p.name} role={p.role} />
+                <VideoTile key={p.id} stream={p.stream} name={p.name} role={p.role} unmuteLabel={c.unmute} />
               ))}
             </div>
           )}
@@ -344,7 +347,7 @@ function LiveRoomInner({
                 <input type="hidden" name="meetingId" value={meetingId} />
                 <input type="text" name="company" tabIndex={-1} autoComplete="off" className="absolute left-[-9999px]" aria-hidden />
                 <input name="name" required defaultValue={name} placeholder={c.yourName} className="w-full rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
-                <input name="email" type="email" required placeholder="E-posta" className="w-full rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
+                <input name="email" type="email" required placeholder={c.email} className="w-full rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
                 <textarea name="prayerRequest" rows={3} placeholder={c.request} className="w-full resize-y rounded-lg border border-ceyhun-ink/15 px-3 py-2 text-sm outline-none focus:border-ceyhun-gold" />
                 {prayerState.message && !prayerState.ok && <p className="text-xs text-red-600">{prayerState.message}</p>}
                 <button type="submit" disabled={prayerPending} className="inline-flex items-center gap-2 rounded-full bg-ceyhun-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-ceyhun-gold-deep disabled:opacity-60">

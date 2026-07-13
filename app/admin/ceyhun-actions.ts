@@ -4,7 +4,8 @@
 // Ceyhun içeriğinin admin mutasyonları. Hepsi EDITOR+ yetkisi ister.
 // İçerik: profil · yazılar · videolar · galeri (albüm + foto).
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { CEYHUN_TAGS } from "@/app/lib/ceyhun-cache";
 import slugify from "slugify";
 import prisma from "@/app/lib/prisma";
 import { requireCeyhunCap } from "@/app/lib/ceyhun-auth";
@@ -87,6 +88,17 @@ function revalidateAll(path?: string) {
   revalidatePath("/admin");
   if (path) revalidatePath(path);
   revalidatePath("/");
+
+  // GELİŞMİŞ: sayfa yolunu tazelemenin yanında ilgili Data Cache TAG'ini de
+  // geçersiz kıl. Böylece unstable_cache ile önbelleğe alınmış public okumalar
+  // (bkz. app/lib/ceyhun-cache.ts) tüm ziyaretçiler için anında tazelenir.
+  const p = path ?? "";
+  if (p.includes("profile") || p.includes("about")) revalidateTag(CEYHUN_TAGS.profile);
+  else if (p.includes("articles")) revalidateTag(CEYHUN_TAGS.articles);
+  else if (p.includes("videos")) revalidateTag(CEYHUN_TAGS.videos);
+  else if (p.includes("gallery")) revalidateTag(CEYHUN_TAGS.gallery);
+  else if (p.includes("courses")) revalidateTag(CEYHUN_TAGS.courses);
+  else if (p.includes("prayer")) revalidateTag(CEYHUN_TAGS.prayer);
 }
 
 // ─────────────────────────── PROFİL ───────────────────────────

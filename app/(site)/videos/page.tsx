@@ -1,11 +1,17 @@
 // app/(site)/videos/page.tsx — Videolar (grid + modal oynatıcı).
 
 import { getCeyhunT } from "@/app/lib/ceyhunT";
-import { getPublishedVideos } from "@/app/lib/ceyhun-data";
+import { getPublishedVideos } from "@/app/lib/ceyhun-cache";
 import VideoGallery from "@/app/components/ceyhun/VideoGallery";
 import { PageHero } from "@/app/components/ceyhun/ui";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getCeyhunT();
+  return { title: t.videos.title, description: t.videos.subtitle };
+}
 
 export default async function VideosPage() {
   const { t, locale } = await getCeyhunT();

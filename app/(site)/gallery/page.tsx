@@ -1,12 +1,18 @@
 // app/(site)/gallery/page.tsx — Galeri (albümler + fotoğraflar, lightbox).
 
 import { getCeyhunT } from "@/app/lib/ceyhunT";
-import { getPublishedAlbums, getPublishedPhotos } from "@/app/lib/ceyhun-data";
+import { getPublishedAlbums, getPublishedPhotos } from "@/app/lib/ceyhun-cache";
 import { pick } from "@/app/lib/ceyhun";
 import PhotoGallery from "@/app/components/ceyhun/PhotoGallery";
 import { PageHero } from "@/app/components/ceyhun/ui";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getCeyhunT();
+  return { title: t.gallery.title, description: t.gallery.subtitle };
+}
 
 export default async function GalleryPage() {
   const { t, locale } = await getCeyhunT();

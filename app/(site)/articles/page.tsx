@@ -1,11 +1,18 @@
 // app/(site)/articles/page.tsx — Yazılar listesi.
 
 import { getCeyhunT } from "@/app/lib/ceyhunT";
-import { getPublishedArticles } from "@/app/lib/ceyhun-data";
+import { localizedHref } from "@/app/lib/i18n-routing";
+import { getPublishedArticles } from "@/app/lib/ceyhun-cache";
 import { pick, formatDate } from "@/app/lib/ceyhun";
 import { ArticleCard, PageHero } from "@/app/components/ceyhun/ui";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getCeyhunT();
+  return { title: t.articles.title, description: t.articles.subtitle };
+}
 
 export default async function ArticlesPage() {
   const { t, locale } = await getCeyhunT();
@@ -22,7 +29,7 @@ export default async function ArticlesPage() {
             {articles.map((a) => (
               <ArticleCard
                 key={a.id}
-                href={`/articles/${a.slug}`}
+                href={localizedHref(locale, `/articles/${a.slug}`)}
                 title={pick(a.title, locale)}
                 excerpt={pick(a.excerpt, locale)}
                 cover={a.coverUrl}

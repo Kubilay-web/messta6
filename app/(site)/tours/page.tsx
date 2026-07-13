@@ -1,11 +1,12 @@
 // app/(site)/tours/page.tsx — Biblical tur kataloğu + rezervasyon başvurusu.
 import type { Metadata } from "next";
+import { getCeyhunT } from "@/app/lib/ceyhunT";
 import ToursView from "@/app/components/ceyhun/ToursView";
 
-export const metadata: Metadata = {
-  title: "Biblical Turlar — İstanbul, 7 Kilise, Kapadokya",
-  description: "Türkiye'de biblical turizm için başvurun: İstanbul, 7 Kilise ve Kapadokya turları; tur ve konaklama ayarlanır.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getCeyhunT();
+  return { title: t.tours.title, description: t.tours.subtitle };
+}
 
 export default function ToursPage() {
   return <ToursView />;

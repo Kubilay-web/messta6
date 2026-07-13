@@ -9,9 +9,10 @@ import { usePathname } from "next/navigation";
 import { Menu, X, HandHeart } from "lucide-react";
 import LangSwitcher from "@/app/components/site/LangSwitcher";
 import { useCeyhunT } from "@/app/lib/useCeyhunT";
+import { localizedHref, stripLocale, toInternalPath } from "@/app/lib/i18n-routing";
 
 export default function SiteHeader({ name }: { name: string }) {
-  const { t } = useCeyhunT();
+  const { t, locale } = useCeyhunT();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -43,7 +44,9 @@ export default function SiteHeader({ name }: { name: string }) {
     { href: "/asistan", label: t.nav.assistant },
   ];
 
-  const active = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  // Aktif link tespiti: dil öneki + çevrili segmenti iç yola çevirip karşılaştır.
+  const current = toInternalPath(stripLocale(pathname).pathname);
+  const active = (href: string) => (href === "/" ? current === "/" : current.startsWith(href));
 
   return (
     <header
@@ -52,7 +55,7 @@ export default function SiteHeader({ name }: { name: string }) {
       }`}
     >
       <div className="mx-auto flex max-w-[84rem] items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex min-w-0 items-center gap-2">
+        <Link href={localizedHref(locale, "/")} className="flex min-w-0 items-center gap-2">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ceyhun-ink font-syne text-sm font-extrabold text-ceyhun-gold">
             AU
           </span>
@@ -65,7 +68,7 @@ export default function SiteHeader({ name }: { name: string }) {
           {links.map((l) => (
             <Link
               key={l.href}
-              href={l.href}
+              href={localizedHref(locale, l.href)}
               className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium transition-colors ${
                 active(l.href) ? "text-ceyhun-gold-deep" : "text-ceyhun-ink/70 hover:text-ceyhun-ink"
               }`}
@@ -78,7 +81,7 @@ export default function SiteHeader({ name }: { name: string }) {
         <div className="flex shrink-0 items-center gap-2">
           <LangSwitcher className="hidden sm:block" />
           <Link
-            href="/donate"
+            href={localizedHref(locale, "/donate")}
             className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-ceyhun-gold px-4 py-2 text-sm font-semibold text-ceyhun-ink transition-colors hover:bg-ceyhun-gold-deep hover:text-white sm:inline-flex"
           >
             <HandHeart className="h-4 w-4" /> {t.nav.donate}
@@ -110,7 +113,7 @@ export default function SiteHeader({ name }: { name: string }) {
             ))}
             <div className="mt-2 flex items-center justify-between border-t border-ceyhun-ink/10 pt-3">
               <LangSwitcher align="left" openUp />
-              <Link href="/donate" className="inline-flex items-center gap-1.5 rounded-full bg-ceyhun-gold px-4 py-2 text-sm font-semibold text-ceyhun-ink">
+              <Link href={localizedHref(locale, "/donate")} className="inline-flex items-center gap-1.5 rounded-full bg-ceyhun-gold px-4 py-2 text-sm font-semibold text-ceyhun-ink">
                 <HandHeart className="h-4 w-4" /> {t.nav.donate}
               </Link>
             </div>

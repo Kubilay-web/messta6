@@ -6,6 +6,7 @@
 import Link from "next/link";
 import { Youtube, Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 import { useCeyhunT } from "@/app/lib/useCeyhunT";
+import { localizedHref } from "@/app/lib/i18n-routing";
 
 type Socials = { youtube?: string; instagram?: string; facebook?: string; x?: string };
 
@@ -22,7 +23,7 @@ export default function SiteFooter({
   location?: string | null;
   socials: Socials;
 }) {
-  const { t } = useCeyhunT();
+  const { t, locale } = useCeyhunT();
   const year = 2026; // sunucu yeniden derlemesinde güncellenir; sabit tutuldu
 
   const cols = [
@@ -59,11 +60,11 @@ export default function SiteFooter({
 
         <div>
           <h4 className="flex items-center gap-2 font-syne text-sm font-bold uppercase tracking-wide text-white/50">
-            <span className="h-px w-5 bg-ceyhun-gold/60" /> Menü
+            <span className="h-px w-5 bg-ceyhun-gold/60" /> {t.nav.menu}
           </h4>
           <ul className="mt-3 grid grid-cols-2 gap-2 text-sm">
             {cols.map((c) => (
-              <li key={c.href}><Link href={c.href} className="text-white/70 transition-colors hover:text-ceyhun-gold">{c.title}</Link></li>
+              <li key={c.href}><Link href={localizedHref(locale, c.href)} className="text-white/70 transition-colors hover:text-ceyhun-gold">{c.title}</Link></li>
             ))}
           </ul>
         </div>
@@ -77,7 +78,7 @@ export default function SiteFooter({
             {phone && <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-ceyhun-gold" /><a href={`tel:${phone}`} className="hover:text-ceyhun-gold">{phone}</a></li>}
             {location && <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-ceyhun-gold" />{location}</li>}
           </ul>
-          <Link href="/tours" className="mt-4 inline-flex rounded-full bg-ceyhun-gold px-4 py-2 text-sm font-semibold text-ceyhun-ink transition-colors hover:bg-white">
+          <Link href={localizedHref(locale, "/tours")} className="mt-4 inline-flex rounded-full bg-ceyhun-gold px-4 py-2 text-sm font-semibold text-ceyhun-ink transition-colors hover:bg-white">
             {t.home.heroCta}
           </Link>
         </div>
