@@ -4,7 +4,7 @@
 // Video ızgarası + modal oynatıcı. Locale'e göre başlık/açıklama seçer.
 
 import { useState } from "react";
-import Image from "next/image";
+import SmartImage from "./SmartImage";
 import { Play, X } from "lucide-react";
 import { pick, muxThumb, parseMuxRef, type Locale } from "@/app/lib/ceyhun";
 import MuxVideo from "./MuxVideo";
@@ -39,7 +39,7 @@ export default function VideoGallery({ videos, locale }: { videos: PublicVideo[]
               className="group text-left"
             >
               <div className="relative aspect-video overflow-hidden rounded-2xl bg-ceyhun-ink shadow-sm ring-1 ring-transparent transition-all duration-300 group-hover:shadow-lg group-hover:ring-2 group-hover:ring-ceyhun-gold/50">
-                {thumb && <Image src={thumb} alt={title} fill className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />}
+                {thumb && <SmartImage src={thumb} alt={title} fill className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />}
                 <div className="absolute inset-0 flex items-center justify-center bg-ceyhun-ink/35 transition-colors duration-300 group-hover:bg-ceyhun-ink/15">
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ceyhun-gold text-ceyhun-ink shadow-lg transition-transform duration-300 group-hover:scale-110">
                     <Play className="ml-0.5 h-6 w-6 fill-current" />

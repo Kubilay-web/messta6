@@ -16,6 +16,38 @@
 
 import Image, { type ImageProps } from "next/image";
 
+// ── Host allowlist guard ────────────────────────────────────────────────────
+// next/image optimizasyon açıkken, `next.config.ts` remotePatterns'da OLMAYAN
+// bir host'lu src için sunucu render'ında RangeError-benzeri "hostname not
+// configured" hatası fırlatır → sayfa 500. Görsel URL'leri admin'den geldiği
+// için (dışarıdan yapıştırılmış bir link olabilir), allowlist dışı host'ları
+// `unoptimized` (optimizer'ı atla, doğrudan yükle) render ederek çökmeyi önler.
+// Allowlist next.config.ts ile BİREBİR aynı tutulmalı.
+const EXACT_HOSTS = new Set([
+  "sb52wuzhjx.ufs.sh",
+  "res.cloudinary.com",
+  "i.ytimg.com",
+  "img.youtube.com",
+  "i.vimeocdn.com",
+  "image.mux.com",
+]);
+const SUFFIX_HOSTS = [".ufs.sh", ".cloudinary.com"];
+
+/** src optimize edilebilir mi (allowlist'te / yerel / data-uri)? Değilse unoptimized gerekir. */
+export function isOptimizableSrc(src: ImageProps["src"]): boolean {
+  if (typeof src !== "string") return true; // StaticImport → yerel, güvenli
+  if (!src) return true;
+  if (src.startsWith("/") || src.startsWith("data:") || src.startsWith("blob:")) return true; // yerel
+  let host: string;
+  try {
+    host = new URL(src).hostname.toLowerCase();
+  } catch {
+    return true; // parse edilemeyen (göreli vb.) → optimizer'a bırak
+  }
+  if (EXACT_HOSTS.has(host)) return true;
+  return SUFFIX_HOSTS.some((suf) => host.endsWith(suf));
+}
+
 // Hafif, tema-nötr shimmer SVG → base64 blur placeholder.
 // (Gri tonlu yumuşak degrade; herhangi bir görsel için güvenli.)
 function shimmer(w: number, h: number) {
@@ -54,6 +86,7 @@ export default function SmartImage({
   quality,
   placeholder,
   blurDataURL: providedBlur,
+  unoptimized,
   ...props
 }: SmartImageProps) {
   // `fill` yoksa width/height'tan blur boyutunu türet.
@@ -63,9 +96,13 @@ export default function SmartImage({
   const usePlaceholder =
     placeholder ?? (blur ? "blur" : undefined);
 
+  // Çağıran açıkça belirtmediyse, allowlist dışı host'ları unoptimized yap (çökme koruması).
+  const resolvedUnoptimized = unoptimized ?? !isOptimizableSrc(props.src);
+
   return (
     <Image
       {...props}
+      unoptimized={resolvedUnoptimized}
       quality={quality ?? 78}
       // fill kullanılıyorsa çağıran taraf `sizes` vermeli; yoksa güvenli varsayılan.
       sizes={sizes ?? (props.fill ? "100vw" : undefined)}

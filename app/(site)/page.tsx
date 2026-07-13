@@ -144,8 +144,8 @@ export default async function HomePage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               {t.home.tourDestinations.map((name) => (
-                <div key={name} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                  <span className="font-syne text-lg font-bold text-ceyhun-gold-soft">{name}</span>
+                <div key={name} className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center sm:p-4">
+                  <span className="block break-words hyphens-auto font-syne text-base font-bold leading-tight text-ceyhun-gold-soft sm:text-lg">{name}</span>
                   <p className="mt-1 text-xs text-white/50">{t.home.tourLabel}</p>
                 </div>
               ))}

@@ -4,7 +4,7 @@ import { validateRequest } from "@/app/auth";
 import { getServerLocale } from "@/app/lib/locale";
 import { localizedHref, type Locale } from "@/app/lib/i18n-routing";
 import { pageMeta } from "@/app/lib/seo";
-import { getCeyhunProfile } from "@/app/lib/ceyhun-data";
+import { getCeyhunProfile } from "@/app/lib/ceyhun-cache";
 import LoginForm from "./login-form";
 
 export const dynamic = "force-dynamic";

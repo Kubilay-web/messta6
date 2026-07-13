@@ -1,6 +1,6 @@
 // app/(site)/courses/page.tsx — Eğitim kataloğu (ücretsiz izlenir, bağışla desteklenir).
 import Link from "next/link";
-import Image from "next/image";
+import SmartImage from "@/app/components/ceyhun/SmartImage";
 import { PlayCircle, Layers, ArrowRight } from "lucide-react";
 import { getCeyhunT } from "@/app/lib/ceyhunT";
 import { localizedHref } from "@/app/lib/i18n-routing";
@@ -40,7 +40,7 @@ export default async function CoursesPage() {
               className="group flex flex-col overflow-hidden rounded-2xl border border-ceyhun-ink/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-ceyhun-gold/40 hover:shadow-xl hover:shadow-ceyhun-ink/10">
               <div className="relative aspect-[16/10] overflow-hidden bg-ceyhun-ink">
                 {course.coverUrl ? (
-                  <Image src={course.coverUrl} alt="" fill className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />
+                  <SmartImage src={course.coverUrl} alt="" fill className="object-cover opacity-90 transition-transform duration-500 group-hover:scale-110" sizes="(max-width:768px) 100vw, 33vw" />
                 ) : (
                   <div className="flex h-full items-center justify-center text-ceyhun-gold/50"><PlayCircle className="h-12 w-12" /></div>
                 )}

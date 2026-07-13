@@ -4,7 +4,7 @@
 // Fotoğraf ızgarası + lightbox (ileri/geri). Locale'e göre başlık seçer.
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import SmartImage from "./SmartImage";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { pick, type Locale } from "@/app/lib/ceyhun";
 
@@ -38,7 +38,7 @@ export default function PhotoGallery({ photos, locale }: { photos: PublicPhoto[]
         {photos.map((p, i) => (
           <button key={p.id} onClick={() => setIdx(i)} className="group block w-full overflow-hidden rounded-xl bg-ceyhun-cream-deep ring-1 ring-transparent transition-all duration-300 hover:ring-2 hover:ring-ceyhun-gold/50">
             <div className="relative w-full">
-              <Image
+              <SmartImage
                 src={p.url}
                 alt={pick(p.caption, locale)}
                 width={500}
@@ -62,7 +62,7 @@ export default function PhotoGallery({ photos, locale }: { photos: PublicPhoto[]
           <button className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20" onClick={(e) => { e.stopPropagation(); prev(); }}><ChevronLeft className="h-7 w-7" /></button>
           <button className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white hover:bg-white/20" onClick={(e) => { e.stopPropagation(); next(); }}><ChevronRight className="h-7 w-7" /></button>
           <div className="max-h-[85vh] max-w-5xl" onClick={(e) => e.stopPropagation()}>
-            <Image src={photos[idx].url} alt="" width={1400} height={1000} className="max-h-[80vh] w-auto rounded-lg object-contain" />
+            <SmartImage src={photos[idx].url} alt="" width={1400} height={1000} className="max-h-[80vh] w-auto rounded-lg object-contain" />
             {pick(photos[idx].caption, locale) && (
               <p className="mt-3 text-center text-sm text-white/70">{pick(photos[idx].caption, locale)}</p>
             )}

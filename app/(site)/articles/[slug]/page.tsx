@@ -1,7 +1,7 @@
 // app/(site)/articles/[slug]/page.tsx — Yazı detayı.
 
 import Link from "next/link";
-import Image from "next/image";
+import SmartImage from "@/app/components/ceyhun/SmartImage";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
@@ -60,7 +60,7 @@ export default async function ArticleDetail({ params }: { params: Promise<{ slug
 
       {a.coverUrl && (
         <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl bg-ceyhun-cream-deep">
-          <Image src={a.coverUrl} alt={title} fill priority className="object-cover" sizes="(max-width:768px) 100vw, 768px" />
+          <SmartImage src={a.coverUrl} alt={title} fill priority className="object-cover" sizes="(max-width:768px) 100vw, 768px" />
         </div>
       )}
 
