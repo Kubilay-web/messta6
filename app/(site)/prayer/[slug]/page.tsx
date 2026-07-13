@@ -29,9 +29,10 @@ export default async function PrayerRoomPage({ params }: { params: Promise<{ slu
   const joinInfo = safeObject<{ embedUrl?: string | null; mode?: string }>(m.joinInfo);
   // Varsayılan: yerleşik WebRTC canlı yayın. Yalnız mode="youtube" + embedUrl ise eski gömülü oynatıcı.
   const useYoutube = joinInfo.mode === "youtube" && Boolean(joinInfo.embedUrl);
+  // scheduledAt cache'ten (unstable_cache) string dönebilir → new Date(...) ile normalize et.
   const fmt = new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "de" ? "de-DE" : "tr-TR", {
     weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
-  }).format(m.scheduledAt);
+  }).format(new Date(m.scheduledAt));
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">

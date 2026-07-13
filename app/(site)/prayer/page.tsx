@@ -26,10 +26,12 @@ export default async function PrayerListPage() {
   const c = COPY[locale] ?? COPY.tr;
   const meetings = await getPublishedMeetings();
 
-  const fmt = (d: Date) =>
+  // NOT: getPublishedMeetings unstable_cache ile sarılı → Date alanları cache'ten string döner.
+  // new Date(...) hem Date hem ISO string'i güvenle kabul eder (aksi halde Intl format NaN→RangeError).
+  const fmt = (d: Date | string) =>
     new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "de" ? "de-DE" : "tr-TR", {
       weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
-    }).format(d);
+    }).format(new Date(d));
 
   return (
     <>
